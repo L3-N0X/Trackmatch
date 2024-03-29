@@ -13,6 +13,7 @@ import {
   DropdownMenu,
   Avatar
 } from '@nextui-org/react';
+import ComparePage from './ComparePage';
 
 import { Playlist } from '@phosphor-icons/react';
 
@@ -110,7 +111,7 @@ const MainAppPage = () => {
           <Routes>
             <Route path="/" element={<p>Main</p>} />
             <Route path="/search" element={<p>Search</p>} />
-            <Route path="/compare" element={<p>Compare</p>} />
+            <Route path="/compare" element={<ComparePage></ComparePage>} />
           </Routes>
           <Button color="secondary" size="large" id="refresh-button" onClick={refreshToken}>
             Refresh
