@@ -1,16 +1,20 @@
-import "./App.css";
-import React, { useEffect, useState } from "react";
-import { access_token, exchangeToken, spotifyApi } from "./spotify";
-import LoginPage from "./pages/LoginPage.jsx";
-import MainAppPage from "./pages/MainAppPage.jsx";
+import './App.css';
+import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { access_token, exchangeToken, refreshToken, spotifyApi } from './spotify';
+import LoginPage from './pages/LoginPage.jsx';
+import MainAppPage from './pages/MainAppPage.jsx';
+import { NextUIProvider } from '@nextui-org/react';
 
 function App() {
+  const navigate = useNavigate();
+  if (access_token) refreshToken();
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
+    const code = params.get('code');
     if (code) {
       // Exchange authorization code for access token
       exchangeToken(code).then(() => {
@@ -23,6 +27,7 @@ function App() {
         });
       });
     } else if (access_token) {
+      refreshToken();
       setLoggedIn(true);
       spotifyApi.setAccessToken(access_token);
       let spotifyUser;
@@ -34,7 +39,11 @@ function App() {
     }
   }, []);
 
-  return <div className="bg-default-50">{loggedIn && user ? <MainAppPage /> : <LoginPage />}</div>;
+  return (
+    <NextUIProvider navigate={navigate}>
+      <div className="bg-default-50">{loggedIn && user ? <MainAppPage /> : <LoginPage />}</div>;
+    </NextUIProvider>
+  );
 }
 
 export default App;

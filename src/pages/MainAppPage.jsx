@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import {
   Button,
   Navbar,
@@ -10,14 +11,15 @@ import {
   DropdownTrigger,
   Dropdown,
   DropdownMenu,
-  Avatar,
-} from "@nextui-org/react";
+  Avatar
+} from '@nextui-org/react';
 
-import { Playlist } from "@phosphor-icons/react";
+import { Playlist } from '@phosphor-icons/react';
 
-import { logout, refreshToken, spotifyApi } from "../spotify";
+import { logout, refreshToken, spotifyApi } from '../spotify';
 
 const MainAppPage = () => {
+  const location = useLocation();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -40,18 +42,39 @@ const MainAppPage = () => {
 
             <NavbarContent className="hidden sm:flex gap-4" justify="center">
               <NavbarItem>
-                <Link color="foreground" href="#">
-                  Features
-                </Link>
-              </NavbarItem>
-              <NavbarItem isActive>
-                <Link href="#" aria-current="page" color="secondary">
-                  Customers
+                <Link
+                  href="/"
+                  aria-current={location.pathname === '/' ? 'page' : undefined}
+                  color={location.pathname === '/' ? 'secondary' : 'foreground'}
+                  className={
+                    'transition-transform hover:scale-105' +
+                    (location.pathname === '/' ? ' font-semibold' : '')
+                  }>
+                  Main
                 </Link>
               </NavbarItem>
               <NavbarItem>
-                <Link color="foreground" href="#">
-                  Integrations
+                <Link
+                  href="/search"
+                  aria-current={location.pathname === '/search' ? 'page' : undefined}
+                  color={location.pathname === '/search' ? 'secondary' : 'foreground'}
+                  className={
+                    'transition-transform hover:scale-105' +
+                    (location.pathname === '/search' ? ' font-semibold' : '')
+                  }>
+                  Search
+                </Link>
+              </NavbarItem>
+              <NavbarItem>
+                <Link
+                  href="/compare"
+                  aria-current={location.pathname === '/compare' ? 'page' : undefined}
+                  color={location.pathname === '/compare' ? 'secondary' : 'foreground'}
+                  className={
+                    'transition-transform hover:scale-105' +
+                    (location.pathname === '/compare' ? ' font-semibold' : '')
+                  }>
+                  Compare
                 </Link>
               </NavbarItem>
             </NavbarContent>
@@ -75,9 +98,6 @@ const MainAppPage = () => {
                     <p className="font-semibold">{user.display_name}</p>
                   </DropdownItem>
                   <DropdownItem key="settings">My Settings</DropdownItem>
-                  <DropdownItem key="team_settings">Team Settings</DropdownItem>
-                  <DropdownItem key="analytics">Analytics</DropdownItem>
-                  <DropdownItem key="system">System</DropdownItem>
                   <DropdownItem key="configurations">Configurations</DropdownItem>
                   <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
                   <DropdownItem key="logout" color="danger" onClick={logout}>
@@ -87,6 +107,11 @@ const MainAppPage = () => {
               </Dropdown>
             </NavbarContent>
           </Navbar>
+          <Routes>
+            <Route path="/" element={<p>Main</p>} />
+            <Route path="/search" element={<p>Search</p>} />
+            <Route path="/compare" element={<p>Compare</p>} />
+          </Routes>
           <Button color="secondary" size="large" id="refresh-button" onClick={refreshToken}>
             Refresh
           </Button>

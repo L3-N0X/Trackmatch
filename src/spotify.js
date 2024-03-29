@@ -1,10 +1,10 @@
-var SpotifyWebApi = require("spotify-web-api-node");
+import SpotifyWebApi from 'spotify-web-api-node';
 
 var spotifyApi = new SpotifyWebApi();
 
 function generateRandomString(length) {
-  let text = "";
-  const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let text = '';
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
   for (let i = 0; i < length; i++) {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
@@ -13,12 +13,12 @@ function generateRandomString(length) {
 }
 
 async function generateCodeChallenge(codeVerifier) {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(codeVerifier));
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(codeVerifier));
 
   return btoa(String.fromCharCode(...new Uint8Array(digest)))
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
 }
 
 function generateUrlWithSearchParams(url, params) {
@@ -32,15 +32,15 @@ function redirectToSpotifyAuthorizeEndpoint() {
   const codeVerifier = generateRandomString(64);
 
   generateCodeChallenge(codeVerifier).then((code_challenge) => {
-    window.localStorage.setItem("code_verifier", codeVerifier);
+    window.localStorage.setItem('code_verifier', codeVerifier);
 
-    window.location = generateUrlWithSearchParams("https://accounts.spotify.com/authorize", {
-      response_type: "code",
+    window.location = generateUrlWithSearchParams('https://accounts.spotify.com/authorize', {
+      response_type: 'code',
       client_id,
-      scope: "user-read-private user-read-email",
-      code_challenge_method: "S256",
+      scope: 'user-read-private user-read-email',
+      code_challenge_method: 'S256',
       code_challenge,
-      redirect_uri,
+      redirect_uri
     });
 
     // If the user accepts spotify will come back to your application with the code in the response query string
@@ -49,43 +49,43 @@ function redirectToSpotifyAuthorizeEndpoint() {
 }
 
 function exchangeToken(code) {
-  console.log("hä exchange");
-  const code_verifier = localStorage.getItem("code_verifier");
+  console.log('hä exchange');
+  const code_verifier = localStorage.getItem('code_verifier');
 
-  return fetch("https://accounts.spotify.com/api/token", {
-    method: "POST",
+  return fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
     },
     body: new URLSearchParams({
       client_id,
-      grant_type: "authorization_code",
+      grant_type: 'authorization_code',
       code,
       redirect_uri,
-      code_verifier,
-    }),
+      code_verifier
+    })
   })
     .then(addThrowErrorToFetch)
     .then((data) => {
       processTokenResponse(data);
 
       // clear search query params in the url
-      window.history.replaceState({}, document.title, "/");
+      window.history.replaceState({}, document.title, '/');
     })
     .catch(handleError);
 }
 
 function refreshToken() {
-  fetch("https://accounts.spotify.com/api/token", {
-    method: "POST",
+  fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
     },
     body: new URLSearchParams({
       client_id,
-      grant_type: "refresh_token",
-      refresh_token,
-    }),
+      grant_type: 'refresh_token',
+      refresh_token
+    })
   })
     .then(addThrowErrorToFetch)
     .then(processTokenResponse)
@@ -119,9 +119,9 @@ function processTokenResponse(data) {
   const t = new Date();
   expires_at = t.setSeconds(t.getSeconds() + data.expires_in);
 
-  localStorage.setItem("access_token", access_token);
-  localStorage.setItem("refresh_token", refresh_token);
-  localStorage.setItem("expires_at", expires_at);
+  localStorage.setItem('access_token', access_token);
+  localStorage.setItem('refresh_token', refresh_token);
+  localStorage.setItem('expires_at', expires_at);
 
   spotifyApi.setAccessToken(access_token);
 
@@ -130,10 +130,10 @@ function processTokenResponse(data) {
 }
 
 function getUserData() {
-  fetch("https://api.spotify.com/v1/me", {
+  fetch('https://api.spotify.com/v1/me', {
     headers: {
-      Authorization: "Bearer " + localStorage.getItem("access_token"),
-    },
+      Authorization: 'Bearer ' + localStorage.getItem('access_token')
+    }
   })
     .then(async (response) => {
       if (response.ok) {
@@ -152,12 +152,12 @@ function getUserData() {
 
 // Your client id from your app in the spotify dashboard:
 // https://developer.spotify.com/dashboard/applications
-const client_id = "a5e226fa7aa74eda8de7679fa4c420e3";
-const redirect_uri = "http://localhost:3000"; // Your redirect uri
+const client_id = 'a5e226fa7aa74eda8de7679fa4c420e3';
+const redirect_uri = 'http://localhost:3000'; // Your redirect uri
 
-let access_token = localStorage.getItem("access_token") || null;
-let refresh_token = localStorage.getItem("refresh_token") || null;
-let expires_at = localStorage.getItem("expires_at") || null;
+let access_token = localStorage.getItem('access_token') || null;
+let refresh_token = localStorage.getItem('refresh_token') || null;
+let expires_at = localStorage.getItem('expires_at') || null;
 
 export default function login() {
   if (access_token === null) {
@@ -175,5 +175,5 @@ export {
   client_id,
   access_token,
   refresh_token,
-  spotifyApi,
+  spotifyApi
 };
