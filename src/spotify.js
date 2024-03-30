@@ -76,24 +76,28 @@ function exchangeToken(code) {
 }
 
 function refreshToken() {
-  fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-    },
-    body: new URLSearchParams({
-      client_id,
-      grant_type: 'refresh_token',
-      refresh_token
+  try {
+    fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+      },
+      body: new URLSearchParams({
+        client_id,
+        grant_type: 'refresh_token',
+        refresh_token
+      })
     })
-  })
-    .then(addThrowErrorToFetch)
-    .then(processTokenResponse)
-    .catch(handleError);
+      .then(addThrowErrorToFetch)
+      .then(processTokenResponse)
+      .catch(handleError);
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 function handleError(error) {
-  console.error(error);
+  console.log(error);
 }
 
 async function addThrowErrorToFetch(response) {
