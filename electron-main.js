@@ -1,82 +1,80 @@
-const { app, BrowserWindow, dialog } = require('electron');
-const express = require('express');
-const { json } = require('express');
-const expressStatic = require('express').static;
-const cors = require('cors');
+// import 'electron-webpack/initialize';
+const { app, BrowserWindow } = require('electron');
+// const express = require('express');
+// const cors = require('cors');
 const path = require('path');
-const isDev = require('electron-is-dev');
-
-const localServerApp = express();
-const PORT = 3000;
-const startLocalServer = (done) => {
-  localServerApp.use(json({ limit: '100mb' }));
-  localServerApp.use(cors());
-  localServerApp.use(expressStatic('./build/'));
-  localServerApp.listen(PORT, async () => {
-    console.log('Server Started on PORT ', PORT);
-    done();
+let isDev;
+import('electron-is-dev')
+  .then((module) => {
+    isDev = module.default;
+  })
+  .catch((err) => {
+    console.error('Failed to load electron-is-dev:', err);
   });
-};
+
+let mainWindow;
+// const expressApp = express();
+// const PORT = 3001;
+
+// expressApp.use(express.json());
+
+// // frontend lets user choose an xml file and once the file is picked, it sends the file path back to frontend
+// expressApp.post('/chooseRekordboxXML', (req, res) => {
+//   // use a dialog to ask the user for the file which should be used in the apllication
+//   dialog
+//     .showOpenDialog({
+//       properties: ['openFile'],
+//       filters: [{ name: 'XML', extensions: ['xml'] }]
+//     })
+//     .then((file) => {
+//       if (file.filePaths.length > 0) {
+//         res.send({ path: file.filePaths[0] });
+//       } else {
+//         res.send({ path: null });
+//       }
+//     });
+// });
+
+// expressApp.listen(PORT, () => {
+//   console.log(`Express server is running on port ${PORT}`);
+// });
 
 function createWindow() {
-  // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation: false
+      preload: path.join(__dirname, 'preload.js')
     }
-    // webPreferences: {
-    //   preload: path.join(__dirname, "preload.js"),
-    // },
   });
+  console.log("IsDev ? : ", isDev)
+  const startURL = 'http://localhost:3000' // Development URL
+    // isDev  ? : true,  `file://${path.join(__dirname, './build/index.html')}`; // Production URL
 
-  // and load the index.html of the app.
-  mainWindow.loadFile('./src/index.html');
-  // const startURL = 'http://localhost:3000';
-  // mainWindow.loadURL(startURL);
+  mainWindow.loadURL(startURL);
 
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+  if (isDev) {
+    mainWindow.webContents.once('did-frame-finish-load', () => {
+      mainWindow.webContents.openDevTools();
+    });
+  }
+
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
-  startLocalServer(createWindow);
+app.on('ready', createWindow);
 
-  app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
 });
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
-app.on('window-all-closed', function () {
-  app.quit();
-});
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
-
-// frontend lets user choose an xml file and once the file is picked, it sends the file path back to frontend
-localServerApp.post('/chooseRekordboxXML', (req, res) => {
-  // use a dialog to ask the user for the file which should be used in the apllication
-  dialog
-    .showOpenDialog({
-      properties: ['openFile'],
-      filters: [{ name: 'XML', extensions: ['xml'] }]
-    })
-    .then((file) => {
-      if (file.filePaths.length > 0) {
-        res.send({ path: file.filePaths[0] });
-      } else {
-        res.send({ path: null });
-      }
-    });
+app.on('activate', () => {
+  if (mainWindow === null) {
+    createWindow();
+  }
 });

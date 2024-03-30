@@ -99,9 +99,11 @@ const MainAppPage = () => {
                     <p className="font-semibold">Signed in as</p>
                     <p className="font-semibold">{user.display_name}</p>
                   </DropdownItem>
-                  <Link to="/settings" key="settings">
-                    <DropdownItem>My Settings</DropdownItem>
-                  </Link>
+                  <DropdownItem>
+                    <Link href="/settings" key="settings">
+                      My Settings
+                    </Link>
+                  </DropdownItem>
                   <DropdownItem key="configurations">Configurations</DropdownItem>
                   <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
                   <DropdownItem key="logout" color="danger" onClick={logout}>

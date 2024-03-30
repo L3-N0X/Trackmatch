@@ -6,12 +6,13 @@ const Settings = () => {
   const [xmlFilePath, setXmlFilePath] = useState('');
 
   const handleFileChange = async () => {
-    const response = await fetch('/chooseRekordboxXML', { method: 'POST' });
-    const data = await response.json();
-    if (data.path) {
-      // setXmlPath(data.path);
-      setXmlFilePath(data.path);
-      localStorage.setItem('xmlPath', data.path);
+    try {
+      const filePath = await window.selectFile();
+      console.log('Selected file path:', filePath);
+      setXmlFilePath(filePath);
+      // Do something with the file path
+    } catch (error) {
+      console.error('Error selecting file:', error);
     }
   };
 

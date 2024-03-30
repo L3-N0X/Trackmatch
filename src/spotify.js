@@ -103,9 +103,11 @@ function handleError(error) {
 async function addThrowErrorToFetch(response) {
   if (response.ok) {
     return response.json();
+  } else if (response.status === 401) {
+    refreshToken();
   } else {
     const error = await response.json();
-    throw new Error(JSON.stringify({ response, error }));
+    console.log(JSON.stringify({ response, error }));
   }
 }
 
@@ -143,14 +145,14 @@ function getUserData() {
       if (response.ok) {
         return response.json();
       } else {
-        throw await response.json();
+        console.log(await response.json());
       }
     })
     .then((data) => {
       console.log(data);
     })
     .catch((error) => {
-      console.error(error);
+      console.log(error);
     });
 }
 
