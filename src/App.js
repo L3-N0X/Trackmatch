@@ -1,7 +1,7 @@
 import './App.css';
 import { useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
-import { access_token, exchangeToken, refreshToken, spotifyApi } from './spotify';
+import { access_token, exchangeToken, refreshToken, spotifyApi } from './spotify.js';
 import LoginPage from './pages/LoginPage.jsx';
 import MainAppPage from './pages/MainAppPage.jsx';
 import { NextUIProvider } from '@nextui-org/react';

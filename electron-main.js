@@ -1,8 +1,13 @@
-import { app, BrowserWindow, dialog } from 'electron';
-import express, { json, static as expressStatic } from 'express';
-import cors from 'cors';
+const { app, BrowserWindow, dialog } = require('electron');
+const express = require('express');
+const { json } = require('express');
+const expressStatic = require('express').static;
+const cors = require('cors');
+const path = require('path');
+const isDev = require('electron-is-dev');
+
 const localServerApp = express();
-const PORT = 8088;
+const PORT = 3000;
 const startLocalServer = (done) => {
   localServerApp.use(json({ limit: '100mb' }));
   localServerApp.use(cors());
@@ -17,15 +22,20 @@ function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,
-    height: 600
+    height: 600,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    }
     // webPreferences: {
     //   preload: path.join(__dirname, "preload.js"),
     // },
   });
 
   // and load the index.html of the app.
-  //   mainWindow.loadFile('index.html')
-  mainWindow.loadURL('http://localhost:' + PORT);
+  mainWindow.loadFile('./src/index.html');
+  // const startURL = 'http://localhost:3000';
+  // mainWindow.loadURL(startURL);
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
@@ -57,7 +67,6 @@ app.on('window-all-closed', function () {
 // frontend lets user choose an xml file and once the file is picked, it sends the file path back to frontend
 localServerApp.post('/chooseRekordboxXML', (req, res) => {
   // use a dialog to ask the user for the file which should be used in the apllication
-
   dialog
     .showOpenDialog({
       properties: ['openFile'],

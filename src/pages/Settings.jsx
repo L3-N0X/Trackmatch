@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { Input } from '@nextui-org/react';
+import { Button } from '@nextui-org/react';
 
 const Settings = () => {
-  const [xmlPath, setXmlPath] = useState('');
+  // const [xmlPath, setXmlPath] = useState('');
   const [xmlFilePath, setXmlFilePath] = useState('');
 
   const handleFileChange = async () => {
-    const response = await fetch('/chooseRekordboxXML');
+    const response = await fetch('/chooseRekordboxXML', { method: 'POST' });
     const data = await response.json();
     if (data.path) {
-      setXmlPath(data.path);
+      // setXmlPath(data.path);
       setXmlFilePath(data.path);
-      localStorage.setItem('xmlPath', xmlPath);
+      localStorage.setItem('xmlPath', data.path);
     }
   };
 
@@ -22,13 +22,10 @@ const Settings = () => {
       <div>
         <h2 className="text-xl font-bold">XML Path</h2>
         <div className="flex flex-col gap-2"></div>
-        <input
-          type="text"
-          value={xmlFilePath}
-          onChange={(event) => setXmlPath(event.target.value)}
-        />
-        <button onClick={handleFileChange}>Choose File</button>
-        <Input type="email" onChange={handleFileChange} />
+        <p>{xmlFilePath}</p>
+        <Button color="primary" onClick={handleFileChange}>
+          Choose File
+        </Button>
       </div>
     </div>
   );

@@ -1,8 +1,8 @@
-import React from "react";
-import { Button } from "@nextui-org/react";
-import { SignIn } from "@phosphor-icons/react";
+import React from 'react';
+import { Button } from '@nextui-org/react';
+import { SignIn } from '@phosphor-icons/react';
 
-import login from "../spotify";
+import login from '../spotify.js';
 
 const LoginPage = () => {
   return (

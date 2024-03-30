@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import SpotifyPlaylist from '../components/SpotifyPlaylist.jsx';
-import { spotifyApi } from '../spotify';
+import { spotifyApi } from '../spotify.js';
 
 const ComparePage = () => {
   const [playlist, setPlaylist] = useState(null);

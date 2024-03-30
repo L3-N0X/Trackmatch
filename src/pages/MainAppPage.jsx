@@ -18,7 +18,7 @@ import ComparePage from './ComparePage';
 import { Playlist } from '@phosphor-icons/react';
 import Settings from './Settings.jsx';
 
-import { logout, refreshToken, spotifyApi } from '../spotify';
+import { logout, refreshToken, spotifyApi } from '../spotify.js';
 
 const MainAppPage = () => {
   const location = useLocation();
@@ -99,9 +99,9 @@ const MainAppPage = () => {
                     <p className="font-semibold">Signed in as</p>
                     <p className="font-semibold">{user.display_name}</p>
                   </DropdownItem>
-                  <DropdownItem key="settings" href="/settings">
-                    My Settings
-                  </DropdownItem>
+                  <Link to="/settings" key="settings">
+                    <DropdownItem>My Settings</DropdownItem>
+                  </Link>
                   <DropdownItem key="configurations">Configurations</DropdownItem>
                   <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
                   <DropdownItem key="logout" color="danger" onClick={logout}>
@@ -115,7 +115,6 @@ const MainAppPage = () => {
             <Route path="/" element={<p>Main</p>} />
             <Route path="/search" element={<p>Search</p>} />
             <Route path="/compare" element={<ComparePage></ComparePage>} />
-
             <Route path="/settings" element={<Settings></Settings>} />
           </Routes>
           <Button color="secondary" size="large" id="refresh-button" onClick={refreshToken}>
