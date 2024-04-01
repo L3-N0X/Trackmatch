@@ -63,8 +63,11 @@ ipcMain.handle('read-and-parse-file', async (event, filePath) => {
     }
 
     try {
+      const parsingOptions = {
+        ignoreAttributes: false
+      };
       // Parse the XML data and return it
-      const parser = new XMLParser();
+      const parser = new XMLParser(parsingOptions);
       let jObj = parser.parse(fileData);
 
       return jObj;
