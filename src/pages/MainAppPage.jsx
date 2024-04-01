@@ -17,6 +17,7 @@ import ComparePage from './ComparePage';
 
 import { Playlist } from '@phosphor-icons/react';
 import Settings from './Settings.jsx';
+import SearchPage from './SearchPage.jsx';
 
 import { logout, refreshToken, spotifyApi } from '../spotify.js';
 
@@ -115,7 +116,7 @@ const MainAppPage = () => {
           </Navbar>
           <Routes>
             <Route path="/" element={<p>Main</p>} />
-            <Route path="/search" element={<p>Search</p>} />
+            <Route path="/search" element={<SearchPage />} />
             <Route path="/compare" element={<ComparePage></ComparePage>} />
             <Route path="/settings" element={<Settings></Settings>} />
           </Routes>

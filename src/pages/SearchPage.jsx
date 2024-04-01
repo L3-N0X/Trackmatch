@@ -1,30 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import SpotifyPlaylist from '../components/SpotifyPlaylist.jsx';
-import { spotifyApi } from '..js';
+// import { loadXMLData } from '../RekordboxXmlUtils';
+// import { ipcRenderer } from 'electron';
 
 const SearchPage = () => {
   const [playlist, setPlaylist] = useState(null);
 
   useEffect(() => {
-    const fetchPlaylist = async () => {
-      try {
-        // Replace 'playlistId' with the actual ID of the Spotify playlist you want to fetch
-        const playlistId = '37i9dQZF1DX7ZUug1ANKRP';
-        await spotifyApi.getPlaylist(playlistId).then((data) => {
-          console.log(data.body);
-          setPlaylist(data.body);
-        });
-      } catch (error) {
-        console.error('Error fetching playlist:', error);
+    const loadAndParseFile = async () => {
+      if (localStorage.getItem('xmlFilePath')) {
+        console.log('XML File Path:', localStorage.getItem('xmlFilePath'));
+        try {
+          const parsedData = await window.readAndParseFile(localStorage.getItem('xmlFilePath'));
+          console.log('Playlist:', parsedData);
+          setPlaylist(parsedData);
+        } catch (err) {
+          console.error(`Error reading and parsing file: ${err}`);
+        }
       }
     };
 
-    fetchPlaylist();
+    // loadAndParseFile();
+    if (window.readAndParseFile) {
+      loadAndParseFile();
+    } else {
+      console.error('readAndParseFile function not available');
+    }
   }, []);
 
-  return (
-    <div>{playlist ? <SpotifyPlaylist playlist={playlist} /> : <p>Loading playlist...</p>}</div>
-  );
+  return <div>{playlist ? <div>LOADED!</div> : <p>Loading playlist...</p>}</div>;
 };
 
 export default SearchPage;

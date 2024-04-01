@@ -1,8 +1,9 @@
-// import 'electron-webpack/initialize';
-const { app, BrowserWindow } = require('electron');
-// const express = require('express');
-// const cors = require('cors');
+const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const path = require('path');
+const fs = require('fs');
+// const { parseXmlData } = require('./src/RekordboxXmlUtils').default;
+const { XMLParser } = require('fast-xml-parser');
+
 let isDev;
 import('electron-is-dev')
   .then((module) => {
@@ -13,31 +14,6 @@ import('electron-is-dev')
   });
 
 let mainWindow;
-// const expressApp = express();
-// const PORT = 3001;
-
-// expressApp.use(express.json());
-
-// // frontend lets user choose an xml file and once the file is picked, it sends the file path back to frontend
-// expressApp.post('/chooseRekordboxXML', (req, res) => {
-//   // use a dialog to ask the user for the file which should be used in the apllication
-//   dialog
-//     .showOpenDialog({
-//       properties: ['openFile'],
-//       filters: [{ name: 'XML', extensions: ['xml'] }]
-//     })
-//     .then((file) => {
-//       if (file.filePaths.length > 0) {
-//         res.send({ path: file.filePaths[0] });
-//       } else {
-//         res.send({ path: null });
-//       }
-//     });
-// });
-
-// expressApp.listen(PORT, () => {
-//   console.log(`Express server is running on port ${PORT}`);
-// });
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -48,9 +24,9 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js')
     }
   });
-  console.log("IsDev ? : ", isDev)
-  const startURL = 'http://localhost:3000' // Development URL
-    // isDev  ? : true,  `file://${path.join(__dirname, './build/index.html')}`; // Production URL
+  console.log('IsDev ? : ', isDev);
+  const startURL = 'http://localhost:3000'; // Development URL
+  // isDev  ? : true,  `file://${path.join(__dirname, './build/index.html')}`; // Production URL
 
   mainWindow.loadURL(startURL);
 
@@ -64,6 +40,54 @@ function createWindow() {
     mainWindow = null;
   });
 }
+
+ipcMain.handle('select-file', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openFile'],
+    filters: [
+      { name: 'XML Files', extensions: ['xml'] } // Add this line to filter for XML files
+    ]
+  });
+
+  if (!result.canceled) {
+    return result.filePaths[0]; // Return the selected file path
+  }
+});
+
+ipcMain.handle('read-and-parse-file', async (event, filePath) => {
+  try {
+    const fileData = fs.readFileSync(filePath, 'utf8');
+    if (!filePath) {
+      console.error('File path is empty');
+      return null;
+    }
+
+    try {
+      // Parse the XML data and return it
+      const parser = new XMLParser();
+      let jObj = parser.parse(fileData);
+
+      return jObj;
+    } catch (err) {
+      console.error(`Error reading file: ${err}`);
+      return null;
+    }
+  } catch (err) {
+    console.error(`Error reading file: ${err}`);
+    throw err;
+  }
+});
+
+// Handle the 'read-file' event in the main process (if needed)
+ipcMain.handle('read-file', async (event, filePath) => {
+  try {
+    const data = fs.readFileSync(filePath, 'utf8');
+    return data;
+  } catch (err) {
+    console.error(`Error reading file: ${err}`);
+    throw err;
+  }
+});
 
 app.on('ready', createWindow);
 

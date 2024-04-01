@@ -1,6 +1,10 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 // Expose the 'selectFile' function to the renderer process
+contextBridge.exposeInMainWorld('readAndParseFile', (filePath) => {
+  return ipcRenderer.invoke('read-and-parse-file', filePath);
+});
+
 contextBridge.exposeInMainWorld('selectFile', async () => {
   return await ipcRenderer.invoke('select-file');
 });
