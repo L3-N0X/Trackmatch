@@ -89,6 +89,7 @@ function refreshToken() {
       })
     })
       .then(addThrowErrorToFetch)
+      .catch(handleError)
       .then(processTokenResponse)
       .catch(handleError);
   } catch (error) {
