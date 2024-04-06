@@ -297,7 +297,23 @@ function convertNode(node, parentFolderId) {
         entry['Id'] = 'root';
         currentId = 'root';
       }
+    } else if (child['@_Type'] === 1) {
+      // Empty Playlist
+      entry = {
+        PlaylistName: child['@_Name'],
+        Entries: child['@_Entries'],
+        Id: generateId(),
+        ParentFolderId: parentFolderId
+      };
+    } else if (child['@_Type'] === 0) {
+      // Empty Folder
+      entry = {
+        Name: child['@_Name'] === 'ROOT' ? 'root' : child['@_Name'] || 'missing name',
+        Entries: Array.isArray(child.NODE) ? child.NODE.length : 1,
+        Id: currentId
+      };
     }
+
     if (entry === null) return;
     let nextEntry = convertNode(child.NODE, currentId);
     entry.Folder = [];
