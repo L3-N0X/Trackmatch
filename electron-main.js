@@ -1,7 +1,6 @@
 const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
-// const { parseXmlData } = require('./src/RekordboxXmlUtils').default;
 const { XMLParser, XMLBuilder } = require('fast-xml-parser');
 
 let isDev;
@@ -84,7 +83,6 @@ ipcMain.handle('read-and-parse-file', async (event, filePath) => {
       let parsedRekordboxXML = parser.parse(rekordboxXmlData);
 
       const parsedDJXML = rekordboxToDjxml(parsedRekordboxXML);
-      // console.log('Parsed DJXML:', parsedDJXML);
 
       const currentDate = new Date();
       const year = currentDate.getFullYear();
@@ -107,13 +105,10 @@ ipcMain.handle('read-and-parse-file', async (event, filePath) => {
         textNodeName: 'Value',
         ignoreAttributes: false,
         cdataTagName: '__cdata',
-        format: false,
+        format: true,
         indentBy: '  ',
-        // supressEmptyNode: true
-        unpairedTags: ['PlaylistTrack', 'CuePoint'],
-        // make PlaylistTrack and CuePoint self closing
-        // selfCloseEmptyNode: true,
-        // selfCloseEmptyElement: true
+        supressEmptyNode: true,
+        unpairedTags: ['PlaylistTrack', 'CuePoint', 'Software'],
         suppressUnpairedNode: false
       };
 
@@ -123,8 +118,6 @@ ipcMain.handle('read-and-parse-file', async (event, filePath) => {
 
       fs.writeFileSync(djxmlFilePath, xmlDataStr, 'utf8');
       console.log('DJXML file written:', djxmlFilePath);
-
-      // localStorage.setItem('djxmlFilePath', djxmlFilePath);
 
       return parsedDJXML;
     } catch (err) {
@@ -182,6 +175,13 @@ function rekordboxToDjxml(parsedRekordboxXmlData) {
     }
   };
 
+  // let idCounter = 0;
+
+  // function getIdCounter() {
+  //   idCounter += 1;
+  //   return idCounter;
+  // }
+
   parsedRekordboxXmlData.DJ_PLAYLISTS.COLLECTION.TRACK.forEach((track) => {
     const newTrack = {
       Id: track['@_TrackID'],
@@ -236,7 +236,7 @@ function rekordboxToDjxml(parsedRekordboxXmlData) {
     if (trackPositionMarks) {
       newTrack.CuePoint = [];
       trackPositionMarks.forEach((cuePoint) => {
-        newTrack.CuePoint.push({
+        let cueEntry = {
           Name: cuePoint['@_Name'],
           Type: cuePoint['@_Type'],
           Start: cuePoint['@_Start'],
@@ -244,7 +244,11 @@ function rekordboxToDjxml(parsedRekordboxXmlData) {
           Red: cuePoint['@_Red'] || 0,
           Green: cuePoint['@_Green'] || 0,
           Blue: cuePoint['@_Blue'] || 0
-        });
+        };
+        if (cuePoint['@_End']) {
+          cueEntry.End = cuePoint['@_End'];
+        }
+        newTrack.CuePoint.push(cueEntry);
       });
     }
 
@@ -261,87 +265,61 @@ function rekordboxToDjxml(parsedRekordboxXmlData) {
 
 function convertNode(node, parentFolderId) {
   let result = [];
-
   if (!Array.isArray(node)) {
     node = [node];
   }
 
   node.forEach((child) => {
-    console.log('Child:', child);
-
-    let entry = {};
-
-    if (child && Array.isArray(child.NODE)) {
-      child.NODE.forEach((nestedChild) => {
-        const currentId = generateId();
-        let folderEntry = {
-          Name: nestedChild['@_Name'] || 'root',
-          ParentFolderId: parentFolderId,
-          Entries: Array.isArray(nestedChild.NODE) ? nestedChild.NODE.length : 1,
-          Id: currentId,
-          Folder: convertNode(nestedChild.NODE, currentId)
-        };
-
-        if (nestedChild.TRACK !== undefined) {
-          entry = {
-            Playlist: {
-              PlaylistName: nestedChild['@_Name'],
-              Entries: nestedChild['@_Entries'],
-              Id: currentId,
-              ParentFolderId: parentFolderId,
-              PlaylistTrack: Array.isArray(nestedChild.TRACK)
-                ? nestedChild.TRACK.map((track) => ({ Id: track['@_Key'] }))
-                : [{ Id: nestedChild.TRACK['@_Key'] }]
-            }
-          };
-          // Push the Playlist directly to the result
-          result.push(entry);
-        } else {
-          // Push the Folder entry
-          result.push(folderEntry);
-        }
-      });
-    } else if (child && child.NODE) {
-      const currentId = generateId();
-      let folderEntry = {
-        Name: child.NODE['@_Name'] || 'root',
-        ParentFolderId: parentFolderId,
-        Entries: Array.isArray(child.NODE.NODE) ? child.NODE.NODE.length : 1,
-        Id: currentId,
-        Folder: convertNode(child.NODE.NODE, currentId)
-      };
-
-      if (child.NODE.TRACK !== undefined) {
-        entry = {
-          Playlist: {
-            PlaylistName: child.NODE['@_Name'],
-            Entries: child.NODE['@_Entries'],
-            Id: currentId,
-            ParentFolderId: parentFolderId,
-            PlaylistTrack: Array.isArray(child.NODE.TRACK)
-              ? child.NODE.TRACK.map((track) => ({ Id: track['@_Key'] }))
-              : [{ Id: child.NODE.TRACK['@_Key'] }]
-          }
-        };
-        // Push the Playlist directly to the result
-        result.push(entry);
-      } else {
-        // Push the Folder entry
-        result.push(folderEntry);
-      }
-    } else if (child && child.TRACK) {
+    let entry = null;
+    if (!child) return;
+    let currentId = generateId();
+    if (child.TRACK !== undefined) {
+      // Handle Playlists
       entry = {
-        Playlist: {
-          PlaylistName: child.Name,
-          Entries: child['@_Entries'],
-          Id: generateId(),
-          ParentFolderId: parentFolderId,
-          PlaylistTrack: Array.isArray(child.TRACK)
-            ? child.TRACK.map((track) => ({ Id: track['@_Key'] }))
-            : [{ Id: child.TRACK['@_Key'] }]
-        }
+        PlaylistName: child['@_Name'],
+        Entries: child['@_Entries'],
+        Id: generateId(),
+        ParentFolderId: parentFolderId,
+        PlaylistTrack: Array.isArray(child.TRACK)
+          ? child.TRACK.map((track) => ({ Id: track['@_Key'] }))
+          : [{ Id: child.TRACK['@_Key'] }]
       };
-      // Push the Playlist directly to the result
+    } else if (child.NODE !== undefined) {
+      // Handle Folders
+      entry = {
+        Name: child['@_Name'] === 'ROOT' ? 'root' : child['@_Name'] || 'missing name',
+        Entries: Array.isArray(child.NODE) ? child.NODE.length : 1,
+        Id: currentId
+      };
+      if (child['@_Name'] !== 'ROOT') {
+        entry['ParentFolderId'] = parentFolderId;
+      } else {
+        entry['Id'] = 'root';
+        currentId = 'root';
+      }
+    }
+    if (entry === null) return;
+    let nextEntry = convertNode(child.NODE, currentId);
+    entry.Folder = [];
+    entry.Playlist = [];
+    nextEntry.forEach((next) => {
+      if (next.PlaylistName) {
+        entry.Playlist.push(next);
+      } else if (next.Name) {
+        entry.Folder.push(next);
+      }
+    });
+
+    //  delete entry.Folder when array still empty
+    if (entry.Folder.length === 0) {
+      delete entry.Folder;
+    }
+    //  delete entry.Playlist when array still empty
+    if (entry.Playlist.length === 0) {
+      delete entry.Playlist;
+    }
+
+    if (entry !== null) {
       result.push(entry);
     }
   });
@@ -350,5 +328,6 @@ function convertNode(node, parentFolderId) {
 }
 
 function generateId() {
-  return Math.random().toString(36).substring(2, 11);
+  return crypto.randomUUID();
+  // return Math.random().toString(36).substring(2, 11);
 }
