@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import {
-  Button,
+  
   Navbar,
   NavbarBrand,
   NavbarContent,
@@ -107,6 +107,9 @@ const MainAppPage = () => {
                   </DropdownItem>
                   <DropdownItem key="configurations">Configurations</DropdownItem>
                   <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
+                  <DropdownItem key="logout" onClick={refreshToken}>
+                    Refresh Token
+                  </DropdownItem>
                   <DropdownItem key="logout" color="danger" onClick={logout}>
                     Log Out
                   </DropdownItem>
@@ -120,9 +123,6 @@ const MainAppPage = () => {
             <Route path="/compare" element={<ComparePage></ComparePage>} />
             <Route path="/settings" element={<Settings></Settings>} />
           </Routes>
-          <Button color="secondary" size="large" id="refresh-button" onClick={refreshToken}>
-            Refresh
-          </Button>
         </>
       ) : (
         <div>Loading</div>

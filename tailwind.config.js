@@ -38,29 +38,50 @@ module.exports = {
         }
       },
       themes: {
-        light: {
+        'purple-light': {
+          extend: 'light', // <- inherit default values from dark theme
           colors: {
-            background: '#FFFFFF', // or DEFAULT
-            foreground: '#11181C', // or 50 to 900 DEFAULT
+            background: '#FEECFE',
+            foreground: '#0D001A',
             primary: {
-              //... 50 to 900
-              foreground: '#FFFFFF',
-              DEFAULT: '#6F00EE'
-            }
-            // ... rest of the colors
+              50: '#3B096C',
+              100: '#520F83',
+              200: '#7318A2',
+              300: '#9823C2',
+              400: '#c031e2',
+              500: '#DD62ED',
+              600: '#F182F6',
+              700: '#FCADF9',
+              800: '#FDD5F9',
+              900: '#FEECFE',
+              DEFAULT: '#DD62ED',
+              foreground: '#0D001A'
+            },
+            focus: '#F182F6'
           }
         },
-        dark: {
+
+        'purple-dark': {
+          extend: 'dark', // <- inherit default values from dark theme
           colors: {
-            background: '#000000', // or DEFAULT
-            foreground: '#ECEDEE', // or 50 to 900 DEFAULT
+            background: '#0D001A',
+            foreground: '#ffffff',
             primary: {
-              //... 50 to 900
-              foreground: '#FFFFFF',
-              DEFAULT: '#EE6F00'
-            }
+              50: '#3B096C',
+              100: '#520F83',
+              200: '#7318A2',
+              300: '#9823C2',
+              400: '#c031e2',
+              500: '#DD62ED',
+              600: '#F182F6',
+              700: '#FCADF9',
+              800: '#FDD5F9',
+              900: '#FEECFE',
+              DEFAULT: '#DD62ED',
+              foreground: '#ffffff'
+            },
+            focus: '#F182F6'
           }
-          // ... rest of the colors
         }
       }
     })

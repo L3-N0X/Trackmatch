@@ -2,6 +2,11 @@ const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { XMLParser } = require('fast-xml-parser'); // XMLBuilder
+const readMusicFolder = require('./electron-helper/readMusicFolder');
+
+readMusicFolder('C:/LEON/MUSIK/DJ').then((tracklist) =>
+  tracklist.forEach((track) => console.log(track))
+);
 
 let isDev;
 import('electron-is-dev')

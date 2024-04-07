@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@nextui-org/react';
+import { ThemeSwitcher } from '../components/ThemeSwitcher.jsx'
+
 
 const Settings = () => {
   // const [xmlPath, setXmlPath] = useState('');
@@ -101,9 +103,15 @@ const Settings = () => {
             Choose Folder
           </Button>
         </div>
+        <div>
+          <h2 className="text-xl font-bold">App Theme</h2>
+          <div className="flex flex-col gap-2">
+            <ThemeSwitcher></ThemeSwitcher>
+          </div>
+        </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
 export default Settings;

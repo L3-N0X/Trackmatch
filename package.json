@@ -17,6 +17,7 @@
     "express": "^4.19.2",
     "fast-xml-parser": "^4.3.6",
     "framer-motion": "^11.0.23",
+    "node-id3": "^0.2.6",
     "postcss-loader": "^8.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -25,6 +26,7 @@
     "spotify-web-api-js": "^1.5.2",
     "spotify-web-api-node": "^5.0.2",
     "style-loader": "^3.3.4",
+    "use-dark-mode": "^2.3.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

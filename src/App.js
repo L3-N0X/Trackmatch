@@ -6,7 +6,10 @@ import LoginPage from './pages/LoginPage.jsx';
 import MainAppPage from './pages/MainAppPage.jsx';
 import { NextUIProvider } from '@nextui-org/react';
 
+import useDarkMode from 'use-dark-mode';
+
 function App() {
+  const darkMode = useDarkMode(false);
   const navigate = useNavigate();
   if (access_token) refreshToken();
   const [loggedIn, setLoggedIn] = useState(false);
@@ -41,8 +44,9 @@ function App() {
 
   return (
     <NextUIProvider navigate={navigate}>
-      <main className="dark text-foreground bg-background">
-        <div className="bg-default-50">{loggedIn && user ? <MainAppPage /> : <LoginPage />}</div>;
+      <main
+        className={`${darkMode.value ? 'purple-dark' : 'purple-light'} text-foreground bg-background h-screen overflow-y-auto`}>
+        <div className="bg-default-50">{loggedIn && user ? <MainAppPage /> : <LoginPage />}</div>
       </main>
     </NextUIProvider>
   );
