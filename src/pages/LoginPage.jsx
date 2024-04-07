@@ -16,7 +16,7 @@ const LoginPage = () => {
         Start Login
       </Button>
     </div>
-  );
-};
+  )
+}
 
 export default LoginPage;

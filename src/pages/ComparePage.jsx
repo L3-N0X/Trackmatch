@@ -24,7 +24,7 @@ const ComparePage = () => {
 
   return (
     <div>{playlist ? <SpotifyPlaylist playlist={playlist} /> : <p>Loading playlist...</p>}</div>
-  );
-};
+  )
+}
 
 export default ComparePage;

@@ -28,6 +28,6 @@ const SearchPage = () => {
   }, []);
 
   return <div>{playlist ? <div>LOADED!</div> : <p>Loading playlist...</p>}</div>;
-};
+}
 
 export default SearchPage;

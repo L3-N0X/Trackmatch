@@ -1,7 +1,7 @@
 const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const { XMLParser, XMLBuilder } = require('fast-xml-parser');
+const { XMLParser } = require('fast-xml-parser'); // XMLBuilder
 
 let isDev;
 import('electron-is-dev')
@@ -53,6 +53,16 @@ ipcMain.handle('select-file', async () => {
   }
 });
 
+ipcMain.handle('select-folder', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openDirectory']
+  });
+
+  if (!result.canceled) {
+    return result.filePaths[0]; // Return the selected file path
+  }
+});
+
 ipcMain.handle('read-and-parse-file', async (event, filePath) => {
   try {
     const rekordboxXmlData = fs.readFileSync(filePath, 'utf8');
@@ -84,40 +94,42 @@ ipcMain.handle('read-and-parse-file', async (event, filePath) => {
 
       const parsedDJXML = rekordboxToDjxml(parsedRekordboxXML);
 
-      const currentDate = new Date();
-      const year = currentDate.getFullYear();
-      const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
-      const day = String(currentDate.getDate()).padStart(2, '0');
+      // TODO: Storing as DJXML outsource and not execute always
 
-      const formattedDate = `${year}_${month}_${day}`;
+      // const currentDate = new Date();
+      // const year = currentDate.getFullYear();
+      // const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+      // const day = String(currentDate.getDate()).padStart(2, '0');
+
+      // const formattedDate = `${year}_${month}_${day}`;
 
       // write the parsed DJXML to a file
-      const djxmlFilePath = path.join(
-        __dirname,
-        'DATA',
-        'DJXML',
-        `from_rekordbox_${formattedDate}_djxml.xml`
-      );
+      // const djxmlFilePath = path.join(
+      //   __dirname,
+      //   'DATA',
+      //   'DJXML',
+      //   `from_rekordbox_${formattedDate}_djxml.xml`
+      // );
       // convert js object back to xml using fast-xml-parser XMLBuilder
-      const buildoptions = {
-        attributeNamePrefix: '',
-        attrNodeName: false,
-        textNodeName: 'Value',
-        ignoreAttributes: false,
-        cdataTagName: '__cdata',
-        format: true,
-        indentBy: '  ',
-        supressEmptyNode: true,
-        unpairedTags: ['PlaylistTrack', 'CuePoint', 'Software'],
-        suppressUnpairedNode: false
-      };
+      // const buildoptions = {
+      //   attributeNamePrefix: '',
+      //   attrNodeName: false,
+      //   textNodeName: 'Value',
+      //   ignoreAttributes: false,
+      //   cdataTagName: '__cdata',
+      //   format: true,
+      //   indentBy: '  ',
+      //   supressEmptyNode: true,
+      //   unpairedTags: ['PlaylistTrack', 'CuePoint', 'Software'],
+      //   suppressUnpairedNode: false
+      // };
 
-      const builder = new XMLBuilder(buildoptions);
-      let xmlDataStr = builder.build(parsedDJXML);
-      xmlDataStr = `<?xml version="1.0" encoding="UTF-8"?>\n` + xmlDataStr;
+      // const builder = new XMLBuilder(buildoptions);
+      // let xmlDataStr = builder.build(parsedDJXML);
+      // xmlDataStr = `<?xml version="1.0" encoding="UTF-8"?>\n` + xmlDataStr;
 
-      fs.writeFileSync(djxmlFilePath, xmlDataStr, 'utf8');
-      console.log('DJXML file written:', djxmlFilePath);
+      // fs.writeFileSync(djxmlFilePath, xmlDataStr, 'utf8');
+      // console.log('DJXML file written:', djxmlFilePath);
 
       return parsedDJXML;
     } catch (err) {

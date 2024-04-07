@@ -41,7 +41,9 @@ function App() {
 
   return (
     <NextUIProvider navigate={navigate}>
-      <div className="bg-default-50">{loggedIn && user ? <MainAppPage /> : <LoginPage />}</div>;
+      <main className="dark text-foreground bg-background">
+        <div className="bg-default-50">{loggedIn && user ? <MainAppPage /> : <LoginPage />}</div>;
+      </main>
     </NextUIProvider>
   );
 }

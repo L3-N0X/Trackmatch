@@ -14,3 +14,13 @@ ipcRenderer.on('file-selected', (event, filePath) => {
   // Send the file path to the renderer process
   window.dispatchEvent(new CustomEvent('file-selected', { detail: filePath }));
 });
+
+contextBridge.exposeInMainWorld('selectFolder', async () => {
+  return await ipcRenderer.invoke('select-folder');
+});
+
+// Handle the 'file-selected' event in the preload script
+ipcRenderer.on('folder-selected', (event, folderPath) => {
+  // Send the file path to the renderer process
+  window.dispatchEvent(new CustomEvent('folder-selected', { detail: folderPath }));
+});

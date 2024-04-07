@@ -128,7 +128,7 @@ const MainAppPage = () => {
         <div>Loading</div>
       )}
     </>
-  );
-};
+  )
+}
 
 export default MainAppPage;
