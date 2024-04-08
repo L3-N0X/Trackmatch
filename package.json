@@ -29,6 +29,7 @@
     "use-dark-mode": "^2.3.1",
     "web-vitals": "^2.1.4"
   },
+  "type": "module",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
