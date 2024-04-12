@@ -1,70 +1,47 @@
-# Getting Started with Create React App
+# TRACKMATCH
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Overview
 
-## Available Scripts
+The Music Collection Manager is a powerful desktop application that helps you manage your local music files, Spotify playlists, and Rekordbox DJ collections. It provides a comprehensive set of features to streamline your music management workflow.
 
-In the project directory, you can run:
+## Key Features
 
-### `npm start`
+1. Local Music File Management: The application allows you to browse and manage your local music files, including the ability to view and edit metadata.
+2. Spotify Integration: Connect your Spotify account to the application and access your playlists. The tool can compare your Spotify playlists with your local music collection and Rekordbox DJ library, highlighting songs that are missing from your collection.
+3. Rekordbox Integration: Seamlessly integrate your Rekordbox DJ collection with the application. Compare your Rekordbox library with your local files and Spotify playlists, and easily export your DJ crates as DJXML files.
+4. Mixing Platform Compatibility: The application supports integration with Mixo, enabling you to convert your DJ crates into DJXML format, which can then be further manipulated and exported to other DJ software.
+5. Playlist Management: Create, edit, and manage playlists across your local music collection, Spotify, and Rekordbox DJ library. Utilize powerful filtering and sorting tools to curate your music.
+6. Track Matching: The application's advanced matching system can automatically link tracks in your local collection with their corresponding Spotify counterparts, enabling seamless export of playlists to Spotify.
+7. Metadata Tagging: Enhance your music library by adding custom tags, genres, and other metadata to your tracks, making it easier to organize and find your music.
+8. Duplicate Detection: The built-in duplicate finder helps you identify and manage duplicate tracks in your music collection, ensuring a clean and organized library.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Getting Started
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+To get started with the Music Collection Manager, follow these steps:
 
-### `npm test`
+1. Clone the Repository: Clone the project repository from GitHub to your local machine.
+2. Install Dependencies: Navigate to the project directory and run the following command to install the required dependencies:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+    ```bash
+    npm install
+    ```
 
-### `npm run build`
+3. Start the Development Server: Use the following command to start the development server and launch the application:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+    ```bash
+    npm run electron-dev
+    ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+   This command will start the React development server and launch the Electron-based desktop application.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+4. Build for Production: When you're ready to package the application for distribution, use the following command:
 
-### `npm run eject`
+    ```bash
+    npm run electron-prod
+    ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+   This command will create a production-ready build of the application.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Contributing
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+We welcome contributions from the community! If you have any ideas, bug reports, or feature requests, please feel free to open an issue or submit a pull request.
