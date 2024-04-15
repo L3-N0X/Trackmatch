@@ -11,7 +11,7 @@ import useDarkMode from 'use-dark-mode';
 function App() {
   const darkMode = useDarkMode(false);
   const navigate = useNavigate();
-  if (access_token) refreshToken();
+  // if (access_token) refreshToken();
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
 
@@ -45,7 +45,7 @@ function App() {
   return (
     <NextUIProvider navigate={navigate}>
       <main
-        className={`${darkMode.value ? 'purple-dark' : 'purple-light'} text-foreground bg-background h-screen overflow-y-auto`}>
+        className={`${darkMode.value ? 'purple-dark' : 'purple-light'} text-foreground bg-background h-screen overflow-y-auto `}>
         <div className="bg-default-50">{loggedIn && user ? <MainAppPage /> : <LoginPage />}</div>
       </main>
     </NextUIProvider>

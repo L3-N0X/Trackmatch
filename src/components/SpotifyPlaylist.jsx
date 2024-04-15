@@ -82,7 +82,8 @@ const SpotifyPlaylist = ({ playlist }) => {
           </div>
         );
       case 'length':
-        return <p key={track.id}>{track.duration_ms / 1000 / 60}</p>;
+        return <p key={track.id}>{`${Math.floor(track.duration_ms / 60000)}:${((track.duration_ms % 60000) / 1000).toFixed(0).padStart(2, '0')}`}</p>;
+      
       default:
         return <div key={track.id}>{track.name}</div>;
     }
@@ -97,7 +98,7 @@ const SpotifyPlaylist = ({ playlist }) => {
       sortDescriptor={list.sortDescriptor}
       onSortChange={list.sort}
       classNames={{
-        base: 'max-h-[520px] overflow-y-scroll',
+        base: 'max-h-[520px]',
         table: 'min-h-[420px]'
       }}>
       <TableHeader columns={columns}>

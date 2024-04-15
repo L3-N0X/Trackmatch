@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require('electron');
+import { contextBridge, ipcRenderer } from 'electron';
 
 // Expose the 'selectFile' function to the renderer process
 contextBridge.exposeInMainWorld('readAndParseFile', (filePath) => {

@@ -1,8 +1,7 @@
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
-// const path = require('path');
 import fs from 'fs';
 import { XMLParser } from 'fast-xml-parser'; // XMLBuilder
-import readMusicFolder from './electron-helper/readMusicFolder.js';
+// import readMusicFolder from './electron-helper/readMusicFolder.js';
 
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -10,7 +9,7 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-readMusicFolder('C:/LEON/MUSIK/DJ');
+// readMusicFolder('C:/LEON/MUSIK/DJ');
 
 let isDev;
 import('electron-is-dev')

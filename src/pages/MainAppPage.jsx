@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import {
-  
   Navbar,
   NavbarBrand,
   NavbarContent,
@@ -14,6 +13,7 @@ import {
   Avatar
 } from '@nextui-org/react';
 import ComparePage from './ComparePage';
+import SpotifyPage from './SpotifyPage';
 
 import { Playlist } from '@phosphor-icons/react';
 import Settings from './Settings.jsx';
@@ -40,7 +40,7 @@ const MainAppPage = () => {
           <Navbar>
             <NavbarBrand>
               <Playlist size={24} weight="duotone" />
-              <p className="font-bold text-inherit pl-2">TRACKSEARCH</p>
+              <p className="font-bold text-inherit pl-2">TRACKMATCH</p>
             </NavbarBrand>
 
             <NavbarContent className="hidden sm:flex gap-4" justify="center">
@@ -80,6 +80,18 @@ const MainAppPage = () => {
                   Compare
                 </Link>
               </NavbarItem>
+              <NavbarItem>
+                <Link
+                  href="/spotify"
+                  aria-current={location.pathname === '/spotify' ? 'page' : undefined}
+                  color={location.pathname === '/spotify' ? 'secondary' : 'foreground'}
+                  className={
+                    'transition-transform hover:scale-105' +
+                    (location.pathname === '/spotify' ? ' font-semibold' : '')
+                  }>
+                  Spotify
+                </Link>
+              </NavbarItem>
             </NavbarContent>
 
             <NavbarContent as="div" justify="end">
@@ -107,7 +119,7 @@ const MainAppPage = () => {
                   </DropdownItem>
                   <DropdownItem key="configurations">Configurations</DropdownItem>
                   <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
-                  <DropdownItem key="logout" onClick={refreshToken}>
+                  <DropdownItem key="refresh" onClick={refreshToken}>
                     Refresh Token
                   </DropdownItem>
                   <DropdownItem key="logout" color="danger" onClick={logout}>
@@ -122,13 +134,14 @@ const MainAppPage = () => {
             <Route path="/search" element={<SearchPage />} />
             <Route path="/compare" element={<ComparePage></ComparePage>} />
             <Route path="/settings" element={<Settings></Settings>} />
+            <Route path="/spotify" element={<SpotifyPage></SpotifyPage>} />
           </Routes>
         </>
       ) : (
         <div>Loading</div>
       )}
     </>
-  )
-}
+  );
+};
 
 export default MainAppPage;
