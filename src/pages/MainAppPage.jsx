@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import {
   Navbar,
   NavbarBrand,
@@ -20,24 +20,33 @@ import Settings from './Settings.jsx';
 import SearchPage from './SearchPage.jsx';
 
 import { logout, refreshToken, spotifyApi } from '../spotify.js';
+import PlaylistPage from './PlaylistPage.jsx';
 
 const MainAppPage = () => {
   const location = useLocation();
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     let spotifyUser;
-    spotifyApi.getMe().then((data) => {
-      console.log(data.body);
-      spotifyUser = data.body;
-      setUser(spotifyUser);
-    });
+    spotifyApi
+      .getMe()
+      .then((data) => {
+        console.log(data.body);
+        spotifyUser = data.body;
+        setUser(spotifyUser);
+      })
+      .catch((error) => {
+        console.log(error);
+        // navigate to login page
+        setUser(null);
+      });
   }, []);
   return (
     <>
       {user ? (
         <>
-          <Navbar>
+          <Navbar className="flex-shrink-0 select-none">
             <NavbarBrand>
               <Playlist size={24} weight="duotone" />
               <p className="font-bold text-inherit pl-2">TRACKMATCH</p>
@@ -48,7 +57,7 @@ const MainAppPage = () => {
                 <Link
                   href="/"
                   aria-current={location.pathname === '/' ? 'page' : undefined}
-                  color={location.pathname === '/' ? 'secondary' : 'foreground'}
+                  color={location.pathname === '/' ? 'primary' : 'foreground'}
                   className={
                     'transition-transform hover:scale-105' +
                     (location.pathname === '/' ? ' font-semibold' : '')
@@ -60,7 +69,7 @@ const MainAppPage = () => {
                 <Link
                   href="/search"
                   aria-current={location.pathname === '/search' ? 'page' : undefined}
-                  color={location.pathname === '/search' ? 'secondary' : 'foreground'}
+                  color={location.pathname === '/search' ? 'primary' : 'foreground'}
                   className={
                     'transition-transform hover:scale-105' +
                     (location.pathname === '/search' ? ' font-semibold' : '')
@@ -72,7 +81,7 @@ const MainAppPage = () => {
                 <Link
                   href="/compare"
                   aria-current={location.pathname === '/compare' ? 'page' : undefined}
-                  color={location.pathname === '/compare' ? 'secondary' : 'foreground'}
+                  color={location.pathname === '/compare' ? 'primary' : 'foreground'}
                   className={
                     'transition-transform hover:scale-105' +
                     (location.pathname === '/compare' ? ' font-semibold' : '')
@@ -84,7 +93,7 @@ const MainAppPage = () => {
                 <Link
                   href="/spotify"
                   aria-current={location.pathname === '/spotify' ? 'page' : undefined}
-                  color={location.pathname === '/spotify' ? 'secondary' : 'foreground'}
+                  color={location.pathname === '/spotify' ? 'primary' : 'foreground'}
                   className={
                     'transition-transform hover:scale-105' +
                     (location.pathname === '/spotify' ? ' font-semibold' : '')
@@ -101,41 +110,46 @@ const MainAppPage = () => {
                     isBordered
                     as="button"
                     className="transition-transform"
-                    color="secondary"
+                    color="primary"
                     name={user.display_name}
                     size="sm"
                     src={user.images[0].url}
                   />
                 </DropdownTrigger>
-                <DropdownMenu aria-label="Profile Actions" variant="flat">
-                  <DropdownItem key="profile" className="h-14 gap-2">
+                <DropdownMenu aria-label="Profile Actions" variant="solid">
+                  <DropdownItem key="profile" className="h-14 gap-2" textValue="profile">
                     <p className="font-semibold">Signed in as</p>
                     <p className="font-semibold">{user.display_name}</p>
                   </DropdownItem>
-                  <DropdownItem>
-                    <Link href="/settings" key="settings">
-                      My Settings
-                    </Link>
+                  <DropdownItem textValue="settings" onClick={() => navigate('/settings')}>
+                    My Settings
                   </DropdownItem>
-                  <DropdownItem key="configurations">Configurations</DropdownItem>
-                  <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
-                  <DropdownItem key="refresh" onClick={refreshToken}>
+                  <DropdownItem key="configurations" textValue="configurations">
+                    Configurations
+                  </DropdownItem>
+                  <DropdownItem key="help_and_feedback" textValue="help and feedback">
+                    Help & Feedback
+                  </DropdownItem>
+                  <DropdownItem key="refresh" onClick={refreshToken} textValue="refresh token">
                     Refresh Token
                   </DropdownItem>
-                  <DropdownItem key="logout" color="danger" onClick={logout}>
+                  <DropdownItem key="logout" color="danger" onClick={logout} textValue="logout">
                     Log Out
                   </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
             </NavbarContent>
           </Navbar>
-          <Routes>
-            <Route path="/" element={<p>Main</p>} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/compare" element={<ComparePage></ComparePage>} />
-            <Route path="/settings" element={<Settings></Settings>} />
-            <Route path="/spotify" element={<SpotifyPage></SpotifyPage>} />
-          </Routes>
+          <div className="overflow-y-auto">
+            <Routes>
+              <Route path="/" element={<p>Main</p>} />
+              <Route path="/search" element={<SearchPage />} />
+              <Route path="/compare" element={<ComparePage></ComparePage>} />
+              <Route path="/settings" element={<Settings></Settings>} />
+              <Route path="/spotify" element={<SpotifyPage></SpotifyPage>}></Route>
+              <Route path="/playlist/:playlistId" Component={PlaylistPage} />
+            </Routes>
+          </div>
         </>
       ) : (
         <div>Loading</div>

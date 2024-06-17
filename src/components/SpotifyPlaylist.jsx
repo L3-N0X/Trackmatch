@@ -6,7 +6,6 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  User,
   Spinner
 } from '@nextui-org/react';
 // import SpotifySong from './SpotifySong';
@@ -67,23 +66,29 @@ const SpotifyPlaylist = ({ playlist }) => {
     switch (columnKey) {
       case 'name':
         return (
-          <User
-            key={track.id}
-            avatarProps={{ radius: 'lg', src: track.album.images[0].url }}
-            description={track.album.release_date}
-            name={track.name}>
-            {track.name}
-          </User>
+          <div key={track.id} style={{ display: 'flex', alignItems: 'center' }}>
+            <img
+              src={track.album.images[0].url}
+              alt={track.name}
+              className="rounded-md mr-3 h-8 w-8 object-cover aspect-square"
+            />
+            <h4>{track.name}</h4>
+          </div>
         );
       case 'artist':
         return (
           <div key={track.id} className="flex flex-col">
-            <p className="text-bold text-sm capitalize text-default-400">{track.artists[0].name}</p>
+            <p className="text-bold text-sm ">{track.artists[0].name}</p>
           </div>
         );
       case 'length':
-        return <p key={track.id}>{`${Math.floor(track.duration_ms / 60000)}:${((track.duration_ms % 60000) / 1000).toFixed(0).padStart(2, '0')}`}</p>;
-      
+        return (
+          <p
+            key={
+              track.id
+            }>{`${Math.floor(track.duration_ms / 60000)}:${((track.duration_ms % 60000) / 1000).toFixed(0).padStart(2, '0')}`}</p>
+        );
+
       default:
         return <div key={track.id}>{track.name}</div>;
     }
@@ -92,21 +97,18 @@ const SpotifyPlaylist = ({ playlist }) => {
   console.log(list.sortDescriptor);
   return (
     <Table
-      isHeaderSticky
       aria-label="Example table with custom cells"
       selectionMode="single"
       sortDescriptor={list.sortDescriptor}
       onSortChange={list.sort}
       classNames={{
-        base: 'max-h-[520px]',
-        table: 'min-h-[420px]'
+        header: 'bg-primary-600 text-primary-50',
+        th: 'text-primary-800',
+        wrapper: 'bg-transparent'
       }}>
       <TableHeader columns={columns}>
         {(column) => (
-          <TableColumn
-            key={column.uid}
-            align={column.uid === 'actions' ? 'center' : 'start'}
-            allowsSorting>
+          <TableColumn key={column.uid} align="start" allowsSorting>
             {column.name}
           </TableColumn>
         )}

@@ -2,6 +2,11 @@ import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import fs from 'fs';
 import { XMLParser } from 'fast-xml-parser'; // XMLBuilder
 // import readMusicFolder from './electron-helper/readMusicFolder.js';
+// import path from 'path';
+
+// set __dirname
+
+const isDev = !app.isPackaged;
 
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -11,14 +16,14 @@ const __dirname = dirname(__filename);
 
 // readMusicFolder('C:/LEON/MUSIK/DJ');
 
-let isDev;
-import('electron-is-dev')
-  .then((module) => {
-    isDev = module.default;
-  })
-  .catch((err) => {
-    console.error('Failed to load electron-is-dev:', err);
-  });
+// let isDev;
+// import('electron-is-dev')
+//   .then((module) => {
+//     isDev = module.default;
+//   })
+//   .catch((err) => {
+//     console.error('Failed to load electron-is-dev:', err);
+//   });
 
 let mainWindow;
 
@@ -27,8 +32,9 @@ function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      nodeIntegration: true,
-      preload: join(__dirname, 'preload.js')
+      nodeIntegration: false, // turn off nodeIntegration
+      contextIsolation: true, // turn on contextIsolation
+      preload: join(__dirname, 'preload.js') // provide the path to preload.js
     }
   });
   console.log('IsDev ? : ', isDev);

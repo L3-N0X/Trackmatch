@@ -3,7 +3,7 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from '@
 import PropTypes from 'prop-types';
 import { FunnelSimple } from '@phosphor-icons/react';
 
-const FilterCapsule = ({ onItemSelected, options }) => {
+const SortCapsule = ({ onItemSelected, options }) => {
   const handleClick = (key) => {
     onItemSelected(key);
   };
@@ -12,11 +12,11 @@ const FilterCapsule = ({ onItemSelected, options }) => {
     <Dropdown>
       <DropdownTrigger>
         <Button variant="solid" radius="full" className="bg-default-100">
-          <FunnelSimple size={24} />
+          <FunnelSimple size={20} />
           Sort by
         </Button>
       </DropdownTrigger>
-      <DropdownMenu aria-label="Static Actions" className="bg-default-200">
+      <DropdownMenu aria-label="Static Actions">
         {options.map((option) => (
           <DropdownItem key={option.key} onClick={() => handleClick(option.key)}>
             {option.label}
@@ -27,7 +27,7 @@ const FilterCapsule = ({ onItemSelected, options }) => {
   );
 };
 
-FilterCapsule.propTypes = {
+SortCapsule.propTypes = {
   onItemSelected: PropTypes.func.isRequired,
   options: PropTypes.arrayOf(
     PropTypes.shape({
@@ -37,4 +37,4 @@ FilterCapsule.propTypes = {
   ).isRequired
 };
 
-export default FilterCapsule;
+export default SortCapsule;

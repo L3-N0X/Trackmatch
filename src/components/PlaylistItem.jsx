@@ -4,9 +4,9 @@ import { SpotifyLogo, Playlist } from '@phosphor-icons/react';
 
 import Atropos from 'atropos/react';
 
-const PlaylistItem = ({ title, image, type }) => {
+const PlaylistItem = ({ title, image, type, onClick }) => {
   return (
-    <Atropos activeOffset={40}>
+    <Atropos activeOffset={40} onClick={onClick}>
       <div className="relative w-full aspect-square rounded-lg overflow-hidden">
         <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex flex-col justify-between py-2 px-4 h-min top-auto">
           <div className="grid grid-cols-[1fr_24px] gap-2" data-atropos-offset="4">
@@ -21,7 +21,7 @@ const PlaylistItem = ({ title, image, type }) => {
           </div>
         </div>
         <div className="aspect-square">
-          <img src={image} className="object-cover w-full h-full" alt={title} />
+          <img src={image} className="object-cover w-full h-full" alt={title} draggable="false" />
         </div>
       </div>
     </Atropos>
@@ -31,7 +31,8 @@ const PlaylistItem = ({ title, image, type }) => {
 PlaylistItem.propTypes = {
   title: PropTypes.string.isRequired,
   image: PropTypes.string.isRequired,
-  type: PropTypes.string.isRequired
+  type: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired
 };
 
 export default PlaylistItem;

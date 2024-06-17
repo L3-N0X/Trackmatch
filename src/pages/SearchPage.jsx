@@ -6,6 +6,7 @@ const SearchPage = () => {
   const [playlist, setPlaylist] = useState(null);
 
   useEffect(() => {
+    console.log('window', window);
     const loadAndParseFile = async () => {
       if (localStorage.getItem('xmlFilePath')) {
         console.log('XML File Path:', localStorage.getItem('xmlFilePath'));
@@ -27,7 +28,7 @@ const SearchPage = () => {
     }
   }, []);
 
-  return <div>{playlist ? <div>LOADED!</div> : <p>Loading playlist...</p>}</div>
-}
+  return <div>{playlist ? <div>LOADED!</div> : <p>Loading playlist...</p>}</div>;
+};
 
 export default SearchPage;
