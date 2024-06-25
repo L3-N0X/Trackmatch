@@ -5,6 +5,7 @@ import { access_token, exchangeToken, refreshToken, spotifyApi } from './spotify
 import LoginPage from './pages/LoginPage.jsx';
 import MainAppPage from './pages/MainAppPage.jsx';
 import { NextUIProvider } from '@nextui-org/react';
+import { MusicProvider } from './components/context/mainContext.jsx';
 
 function App() {
   const navigate = useNavigate();
@@ -58,15 +59,16 @@ function App() {
       if (alreadyRefreshed) return;
       console.log('Else bei login');
       alreadyRefreshed = true;
-      refreshToken();
-      spotifyApi.setAccessToken(access_token);
-      let spotifyUser;
-      spotifyApi.getMe().then((data) => {
-        console.log(data.body);
-        spotifyUser = data.body;
-        setUser(spotifyUser);
+      refreshToken().then(() => {
+        spotifyApi.setAccessToken(access_token);
+        let spotifyUser;
+        spotifyApi.getMe().then((data) => {
+          console.log(data.body);
+          spotifyUser = data.body;
+          setUser(spotifyUser);
+        });
+        setLoggedIn(true);
       });
-      setLoggedIn(true);
     } else {
       console.log('nicht eingeloggt');
     }
@@ -74,14 +76,16 @@ function App() {
 
   return (
     <NextUIProvider navigate={navigate}>
-      <main
-        //Dark mode changer
-        // eslint-disable-next-line no-constant-condition
-        className={`${theme === 'dark' ? 'purple-dark' : 'purple-light'} text-foreground bg-background `}>
-        <div className="h-screen flex flex-col select-none">
-          {loggedIn && user ? <MainAppPage /> : <LoginPage />}
-        </div>
-      </main>
+      <MusicProvider>
+        <main
+          //Dark mode changer
+          // eslint-disable-next-line no-constant-condition
+          className={`${theme === 'dark' ? 'purple-dark' : 'purple-light'} text-foreground bg-background `}>
+          <div className="h-screen flex flex-col select-none">
+            {loggedIn && user ? <MainAppPage /> : <LoginPage />}
+          </div>
+        </main>
+      </MusicProvider>
     </NextUIProvider>
   );
 }

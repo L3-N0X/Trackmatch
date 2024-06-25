@@ -74,7 +74,7 @@ const MainAppPage = () => {
                     'transition-transform hover:scale-105' +
                     (location.pathname === '/search' ? ' font-semibold' : '')
                   }>
-                  Search
+                  Library
                 </Link>
               </NavbarItem>
               <NavbarItem>

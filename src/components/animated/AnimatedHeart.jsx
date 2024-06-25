@@ -23,9 +23,9 @@ const AnimatedHeart = () => {
 
   const getIcon = () => {
     if (broken) {
-      return <HeartBreak size={32} weight="fill" className="text-purple-500" />;
+      return <HeartBreak size={32} weight="fill" className="text-primary-600" />;
     } else if (liked) {
-      return <Heart size={32} weight="fill" className="text-purple-500" />;
+      return <Heart size={32} weight="fill" className="text-primary-600" />;
     } else if (hovered) {
       return <Heart size={32} weight="duotone" className="text-white" />;
     } else {
@@ -35,7 +35,7 @@ const AnimatedHeart = () => {
 
   return (
     <motion.div
-      className="h-16 w-16 rounded-md text-primary-400 flex items-center justify-center cursor-pointer"
+      className="h-10 w-10 rounded-md text-primary-400 flex items-center justify-center cursor-pointer"
       onClick={toggleLike}
       onMouseEnter={() => {
         setHovered(true);

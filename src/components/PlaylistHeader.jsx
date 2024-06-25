@@ -47,7 +47,9 @@ const PlaylistHeader = ({ playlist }) => {
             name={owner.display_name}
             description={convLargeToString(ownerProfile?.followers.total) + ' followers'}
             id={owner.id}
-            avatarProps={{ src: ownerProfile?.images[0].url }}
+            avatarProps={
+              ownerProfile?.images.length > 0 ? { src: ownerProfile?.images[0].url } : null
+            }
             className="mb-2"
           />
 

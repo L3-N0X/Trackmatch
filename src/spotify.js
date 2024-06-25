@@ -75,9 +75,9 @@ function exchangeToken(code) {
     .catch(handleError);
 }
 
-function refreshToken() {
+async function refreshToken() {
   try {
-    fetch('https://accounts.spotify.com/api/token', {
+    await fetch('https://accounts.spotify.com/api/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'

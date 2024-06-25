@@ -4,12 +4,17 @@ import SpotifyPlaylist from '../components/SpotifyPlaylist.jsx';
 import { spotifyApi } from '../spotify.js';
 import { Spinner } from '@nextui-org/react';
 import PlaylistHeader from '../components/PlaylistHeader.jsx';
-import { Play } from '@phosphor-icons/react';
 import AnimatedHeart from '../components/animated/AnimatedHeart.jsx';
-import { AnimatedShuffle } from '../components/animated/AnimatedShuffle.jsx';
+import AnimatedShuffle from '../components/animated/AnimatedShuffle.jsx';
+import AnimatedPlayButton from '../components/animated/AnimatedPlayButton.jsx';
+import AnimatedIntersect from '../components/animated/AnimatedIntersect.jsx';
+import { useMusic } from '../components/context/mainContext.jsx';
+
+import { Link } from 'react-router-dom';
 
 const PlaylistPage = () => {
   const [playlist, setPlaylist] = useState(null);
+  const { selectPlaylist } = useMusic();
 
   // extract playlistId from URL (playlist/:playlistId
   const { playlistId } = useParams();
@@ -36,11 +41,20 @@ const PlaylistPage = () => {
         <>
           <PlaylistHeader playlist={playlist} />
           <div className="pt-4 px-4 flex flex-row items-center gap-2">
-            <div className="h-16 w-16 rounded-md bg-primary-600 flex items-center justify-center">
-              <Play size={32} />
-            </div>
+            <AnimatedPlayButton />
             <AnimatedShuffle />
             <AnimatedHeart />
+            <Link to="/compare">
+              <button
+                type="button"
+                className="bg-transparent"
+                onClick={() => {
+                  console.log('Intersect button clicked');
+                  selectPlaylist(playlist);
+                }}>
+                <AnimatedIntersect />
+              </button>
+            </Link>
           </div>
           <SpotifyPlaylist playlist={playlist} />
         </>
