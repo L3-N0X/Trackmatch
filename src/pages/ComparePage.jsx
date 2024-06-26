@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMusic } from '../components/context/mainContext.jsx';
 import { getAllLocalTracks } from '../localMusic.js';
 import { getMatchLocalSpotify } from '../utils.js';
@@ -7,48 +7,42 @@ const ComparePage = () => {
   const { currentPlaylist } = useMusic();
   const [potentialMatches, setPotentialMatches] = useState({});
 
-  getAllLocalTracks().then((localTrackList) => {
-    console.log('local', localTrackList);
-    console.log('current', currentPlaylist);
-
-    const spotifyTrackList = currentPlaylist ? currentPlaylist.tracks.items : [];
-
-    let temp_potentialMatches = {};
-
+  useEffect(() => {
     if (!currentPlaylist) {
-      return <p>Select a playlist first!</p>;
+      // Frühzeitiger Abbruch, wenn keine Playlist ausgewählt ist
+      return;
     }
 
-    spotifyTrackList?.forEach((spotifyTrack) => {
-      temp_potentialMatches[spotifyTrack.track.id + ' - ' + spotifyTrack.track.name] = [];
-      localTrackList?.forEach((localTrack) => {
-        // Early exit if tracks are obviously dissimilar
-        if (!localTrack.Title.includes(spotifyTrack.track.name.split(' ')[0])) {
-          return; // Skip further coparisons for this pair
-        }
+    getAllLocalTracks().then((localTrackList) => {
+      console.log('local', localTrackList);
+      console.log('current', currentPlaylist);
 
-        const [matchValue, percentage] = getMatchLocalSpotify(localTrack, spotifyTrack);
-        if (matchValue > 90) {
-          return; // Skip further coparisons for this pair
-        }
-        temp_potentialMatches[spotifyTrack.track.id + ' - ' + spotifyTrack.track.name].push({
-          localTrack,
-          matchValue,
-          percentage
+      const spotifyTrackList = currentPlaylist.tracks.items;
+      let temp_potentialMatches = {};
+
+      spotifyTrackList.forEach((spotifyTrack) => {
+        temp_potentialMatches[spotifyTrack.track.id + ' - ' + spotifyTrack.track.name] = [];
+        localTrackList.forEach((localTrack) => {
+          if (!localTrack.Title.includes(spotifyTrack.track.name.split(' ')[0])) {
+            return; // Frühzeitiger Abbruch, wenn die Titel offensichtlich nicht übereinstimmen
+          }
+
+          const [matchValue, percentage] = getMatchLocalSpotify(localTrack, spotifyTrack);
+          if (matchValue > 90) {
+            return; // Frühzeitiger Abbruch, wenn die Übereinstimmung gering ist
+          }
+          temp_potentialMatches[spotifyTrack.track.id + ' - ' + spotifyTrack.track.name].push({
+            localTrack,
+            matchValue,
+            percentage
+          });
         });
       });
-      // Sort by matchValue
-      temp_potentialMatches[spotifyTrack.track.id + ' - ' + spotifyTrack.track.name].sort(
-        (a, b) => {
-          return a.matchValue - b.matchValue;
-        }
-      );
+
+      setPotentialMatches(temp_potentialMatches);
+      console.log('potentialMatches', temp_potentialMatches);
     });
-
-    setPotentialMatches(temp_potentialMatches);
-
-    console.log('potentialMatches', temp_potentialMatches);
-  });
+  }, [currentPlaylist]); // Abhängigkeit: currentPlaylist
 
   return (
     <>
