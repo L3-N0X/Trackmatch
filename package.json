@@ -3,13 +3,31 @@
   "version": "0.1.0",
   "private": true,
   "main": "electron-main.js",
+  "homepage": "./",
+  "description": "Match your DJ library with Spotify and create playlists with ease.",
+  "author": "L3-N0X",
+  "keywords": [
+    "spotify",
+    "music",
+    "electron",
+    "react",
+    "redux",
+    "tailwindcss",
+    "tailwind-scrollbar",
+    "framer-motion",
+    "phosphor-icons",
+    "nextui",
+    "dj",
+    "library",
+    "playlist",
+    "rekordbox"
+  ],
   "dependencies": {
     "@nextui-org/react": "^2.4.0",
     "@phosphor-icons/react": "^2.0.15",
     "@react-stately/data": "^3.11.2",
     "atropos": "^2.0.2",
     "cors": "^2.8.5",
-    "electron": "^30.0.9",
     "electron-is-dev": "^3.0.1",
     "express": "^4.19.2",
     "fast-xml-parser": "^4.3.6",
@@ -59,6 +77,8 @@
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
     "css-loader": "^7.1.2",
+    "electron": "^30.0.9",
+    "electron-builder": "^24.13.3",
     "electron-react-devtools": "^0.5.3",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
@@ -70,5 +90,28 @@
     "tailwind-scrollbar": "^3.1.0",
     "tailwindcss": "^3.4.3",
     "wait-on": "^7.2.0"
+  },
+  "build": {
+    "appId": "com.l3-n0x.trackmatch",
+    "productName": "TrackMatch",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "build/**/*",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "src/assets",
+        "to": "assets",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "icon": "build/icon.ico"
+    }
   }
 }
