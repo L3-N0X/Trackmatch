@@ -57,3 +57,5 @@ Commit that change (git commit -am v1.2.3)
 Tag your commit (git tag v1.2.3). Make sure your tag name's format is v*.*.*. Your workflow will use this tag to detect when to create a release
 Push your changes to GitHub (git push && git push --tags)
 After building successfully, the action will publish your release artifacts.
+
+[actions/electron-builder-action](https://github.com/marketplace/actions/electron-builder-action)
