@@ -76,14 +76,45 @@ function levenshteinDistance(str1, str2) {
 
   return dp[len1][len2];
 }
+
+function jaccardSimilarity(str1, str2) {
+  // Remove common words that don't significantly contribute to the song identity
+  const commonWords = ['the', 'a', 'an', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by'];
+  const cleanName1 = str1
+    .split(' ')
+    .filter((word) => !commonWords.includes(word))
+    .join(' ');
+  const cleanName2 = str2
+    .split(' ')
+    .filter((word) => !commonWords.includes(word))
+    .join(' ');
+
+  // Calculate Jaccard similarity
+  const set1 = new Set(cleanName1.split(' '));
+  const set2 = new Set(cleanName2.split(' '));
+  const intersection = new Set([...set1].filter((x) => set2.has(x)));
+  const union = new Set([...set1, ...set2]);
+  const jaccardSimilarity = intersection.size / union.size;
+
+  // Calculate edit distance similarity
+  const maxLength = Math.max(cleanName1.length, cleanName2.length);
+  const editDistance = levenshteinDistance(cleanName1, cleanName2);
+  const editSimilarity = 1 - editDistance / maxLength;
+
+  // Combine Jaccard and edit distance similarities
+  return jaccardSimilarity * 0.7 + editSimilarity * 0.3;
+}
+
 function compareTracks(standardTrack1, standardTrack2) {
   const weights = {
     album: 4,
     year: 2,
     artists: 7,
     duration: 1,
-    name: 13,
-    missingPenalty: 20 // Penalty for missing attributes
+    // name: 13,
+    nameMain: 20,
+    nameSecondary: 5,
+    missingPenalty: 50 // Penalty for missing attributes
   };
 
   let totalScore = 0;
@@ -133,12 +164,27 @@ function compareTracks(standardTrack1, standardTrack2) {
 
   // Compare track names
   if (standardTrack1.name && standardTrack2.name) {
-    totalScore +=
-      weights.name *
-      levenshteinDistance(
-        String(standardTrack1.name).toLowerCase(),
-        String(standardTrack2.name).toLowerCase()
+    const [name1Main, name1Secondary = ''] = String(standardTrack1.name).split('(');
+    const [name2Main, name2Secondary = ''] = String(standardTrack2.name).split('(');
+
+    // Compare main part of the name
+    const mainNameSimilarity = jaccardSimilarity(
+      name1Main.trim().toLowerCase(),
+      name2Main.trim().toLowerCase()
+    );
+    totalScore += weights.nameMain * (1 - mainNameSimilarity);
+
+    // Compare secondary part of the name (if it exists)
+    if (name1Secondary || name2Secondary) {
+      const secondaryNameDistance = levenshteinDistance(
+        name1Secondary.replace(')', '').trim().toLowerCase(),
+        name2Secondary.replace(')', '').trim().toLowerCase()
       );
+      const maxSecondaryLength = Math.max(name1Secondary.length, name2Secondary.length);
+      const normalizedSecondaryDistance = secondaryNameDistance / (maxSecondaryLength || 1);
+      totalScore += weights.nameSecondary * normalizedSecondaryDistance;
+    }
+
     attributesCompared++;
   } else {
     totalScore += weights.missingPenalty;
