@@ -17,6 +17,16 @@ TRACKMATCH is a powerful desktop application that helps you manage your local mu
 7. **Metadata Tagging:** Enhance your music library by adding custom tags, genres, and other metadata to your tracks, making it easier to organize and find your music.
 8. **Duplicate Detection:** The built-in duplicate finder helps you identify and manage duplicate tracks in your music collection, ensuring a clean and organized library.
 
+## Installation
+
+You can download the latest version of the TRACKMATCH application from the following link:
+[TrackMatch/releases](https://github.com/L3-N0X/Trackmatch/releases)
+
+The application is available for Windows, macOS, and Linux platforms.
+
+> [!WARNING]
+> Currently, the application is in the early stages of development, and some features may not be fully implemented or functional. We recommend using the application for testing and feedback purposes only.
+
 ## Getting Started
 
 To get started with the TRACKMATCH, follow these steps:
