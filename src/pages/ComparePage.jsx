@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useMusic } from '../components/context/mainContext.jsx';
 import { getAllLocalTracks } from '../localMusic.js';
 import { getMatchLocalSpotify } from '../utils.js';
+import CompareTrack from '../components/CompareTrack.jsx';
 
 const ComparePage = () => {
   const { currentPlaylist } = useMusic();
@@ -48,25 +49,26 @@ const ComparePage = () => {
     });
   }, [currentPlaylist]);
 
-  const getTrack = (spotifyTrackKey) => {
-    const spotifyTrack = currentPlaylist.tracks.items.find(
-      (track) => track.track.id === spotifyTrackKey
-    );
-    return spotifyTrack.track.name + ' - ' + spotifyTrack.track.artists[0].name;
+  const getTrack = (trackID) => {
+    const spotifyTrack = currentPlaylist.tracks.items.find((track) => track.track.id === trackID);
+    return spotifyTrack.track;
   };
 
   return (
     <>
-      {potentialMatches ? (
-        <div>
-          {Object.keys(potentialMatches).map((spotifyTrackKey) => {
+      {potentialMatches && currentPlaylist ? (
+        <div className="p-4">
+          {Object.keys(potentialMatches).map((trackID) => {
             return (
-              <div key={spotifyTrackKey}>
-                <div className="text-xl text-primary-600">
-                  <p>{getTrack(spotifyTrackKey)}</p>
+              <div key={trackID} className="">
+                <div className="text-xl text-primary-600 ">
+                  <CompareTrack
+                    track={getTrack(trackID)}
+                    key={trackID}
+                    isSource={true}></CompareTrack>
                 </div>
                 <ul>
-                  {potentialMatches[spotifyTrackKey].map((match) => {
+                  {potentialMatches[trackID].map((match) => {
                     return (
                       <li key={match.localTrack.Title} className="w-full grid grid-cols-3">
                         <p>{match.localTrack.Title + ' - ' + match.localTrack.Artist}</p>

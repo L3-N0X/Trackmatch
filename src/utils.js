@@ -43,6 +43,13 @@ export function secondsToReadableTime(seconds) {
   return timeString.trim();
 }
 
+export function msToReadableTime(ms) {
+  // convert ms to mm:ss
+  const minutes = Math.floor(ms / 60000);
+  const seconds = ((ms % 60000) / 1000).toFixed(0);
+  return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+}
+
 export function stripHtmlTags(html) {
   return html.replace(/<\/?[^>]+(>|$)/g, '');
 }
@@ -112,9 +119,9 @@ function compareTracks(standardTrack1, standardTrack2) {
     artists: 7,
     duration: 1,
     // name: 13,
-    nameMain: 20,
-    nameSecondary: 5,
-    missingPenalty: 50 // Penalty for missing attributes
+    nameMain: 40,
+    nameSecondary: 10,
+    missingPenalty: 10 // Penalty for missing attributes
   };
 
   let totalScore = 0;
