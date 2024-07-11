@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Select, SelectItem, Input } from '@nextui-org/react';
 import { Folder, File } from '@phosphor-icons/react';
+import { loadAndParseFile } from '../localMusic';
 
 const Settings = () => {
   // const [xmlPath, setXmlPath] = useState('');
@@ -23,6 +24,8 @@ const Settings = () => {
       const filePath = await window.selectFile();
       setXmlFilePath(filePath);
       localStorage.setItem('xmlFilePath', filePath);
+      window.readAndParseFile(filePath);
+      loadAndParseFile();
     } catch (error) {
       console.error('Error selecting file:', error);
     }
