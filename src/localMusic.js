@@ -32,4 +32,4 @@ function getAllLocalTracks() {
   });
 }
 
-export { getLocalMusic, getAllLocalTracks };
+export { getLocalMusic, getAllLocalTracks, loadAndParseFile };
