@@ -55,29 +55,22 @@ export function stripHtmlTags(html) {
 }
 
 function levenshteinDistance(str1, str2) {
-  const len1 = str1.length;
-  const len2 = str2.length;
+  const len1 = str1.length,
+    len2 = str2.length;
+  if (len1 === 0) return len2;
+  if (len2 === 0) return len1;
 
-  // Create a matrix
-  const dp = Array.from(Array(len1 + 1), () => Array(len2 + 1).fill(0));
+  const dp = Array(len1 + 1)
+    .fill(null)
+    .map(() => Array(len2 + 1).fill(null));
 
-  // Initialize the matrix
-  for (let i = 0; i <= len1; i++) {
-    dp[i][0] = i;
-  }
-  for (let j = 0; j <= len2; j++) {
-    dp[0][j] = j;
-  }
+  for (let i = 0; i <= len1; i++) dp[i][0] = i;
+  for (let j = 0; j <= len2; j++) dp[0][j] = j;
 
-  // Compute the distances
   for (let i = 1; i <= len1; i++) {
     for (let j = 1; j <= len2; j++) {
       const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
-      dp[i][j] = Math.min(
-        dp[i - 1][j] + 1, // Deletion
-        dp[i][j - 1] + 1, // Insertion
-        dp[i - 1][j - 1] + cost // Substitution
-      );
+      dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
     }
   }
 
@@ -85,134 +78,81 @@ function levenshteinDistance(str1, str2) {
 }
 
 function jaccardSimilarity(str1, str2) {
-  // Calculate Jaccard similarity
-  const set1 = new Set(str1.split(' '));
-  const set2 = new Set(str2.split(' '));
+  const set1 = new Set(str1.split(' ')),
+    set2 = new Set(str2.split(' '));
   const intersection = new Set([...set1].filter((x) => set2.has(x)));
   const union = new Set([...set1, ...set2]);
-  const jaccardSimilarity = intersection.size / union.size;
-
-  return 1 - jaccardSimilarity;
+  return 1 - intersection.size / union.size;
 }
 
-function CompareSourceTracks(standardTrack1, standardTrack2) {
+function compareSourceTracks(track1, track2) {
   const weights = {
-    album: 4,
-    year: 4,
-    artists: 20,
-    nameLevenshtein: 4,
+    album: 1,
+    year: 1,
+    artists: 45,
+    nameLevenshtein: 13,
     nameJaccard: 20,
-    nameLength: 20,
-    missingPenalty: 50 // Penalty for missing attributes
+    nameLength: 4,
+    missingPenalty: 20
   };
+  let totalScore = 0,
+    attributesCompared = 0;
 
-  let totalScore = 0;
-  let attributesCompared = 0;
-
-  // Compare album names
-  if (standardTrack1.album && standardTrack2.album) {
-    totalScore +=
-      weights.album *
-      levenshteinDistance(
-        String(standardTrack1.album).toLowerCase(),
-        String(standardTrack2.album).toLowerCase()
+  function compareAttribute(attribute, weight, comparisonFunction = levenshteinDistance) {
+    if (track1[attribute] && track2[attribute]) {
+      const score = comparisonFunction(
+        String(track1[attribute]).toLowerCase(),
+        String(track2[attribute]).toLowerCase()
       );
-    attributesCompared++;
+      totalScore += weight * (attribute === 'year' ? (score === 0 ? 0 : 1) : score);
+      attributesCompared++;
+    } else {
+      totalScore += weights.missingPenalty;
+    }
+  }
+
+  compareAttribute('album', weights.album);
+  compareAttribute('year', weights.year, (y1, y2) => (y1 === y2 ? 0 : 1));
+  compareAttribute('artists', weights.artists, jaccardSimilarity);
+  if (track1.name && track2.name) {
+    // split name at a ( or - and compare the first part of the name seperately
+    const nameParts1 = track1.name.split(/[-()]/),
+      nameParts2 = track2.name.split(/[-()]/);
+    if (
+      (nameParts1[0].length > 2 || nameParts2[0].length > 2) &&
+      (nameParts1.length > 1 || nameParts2.length > 1)
+    ) {
+      totalScore +=
+        weights.nameLevenshtein *
+        levenshteinDistance(nameParts1[0].toLowerCase(), nameParts2[0].toLowerCase());
+      totalScore +=
+        weights.nameJaccard *
+        jaccardSimilarity(nameParts1[0].toLowerCase(), nameParts2[0].toLowerCase());
+      totalScore +=
+        weights.nameLength *
+        (1 -
+          Math.abs(nameParts1[0].length - nameParts2[0].length) /
+            Math.max(nameParts1[0].length, nameParts2[0].length));
+      attributesCompared++;
+    } else {
+      const name1 = track1.name.toLowerCase(),
+        name2 = track2.name.toLowerCase();
+      totalScore += weights.nameLevenshtein * levenshteinDistance(name1, name2);
+      totalScore += weights.nameJaccard * jaccardSimilarity(name1, name2);
+      totalScore +=
+        weights.nameLength *
+        (1 - Math.abs(name1.length - name2.length) / Math.max(name1.length, name2.length));
+      attributesCompared++;
+    }
   } else {
     totalScore += weights.missingPenalty;
   }
 
-  console.log(
-    'totalScore',
-    totalScore,
-    'attributesCompared',
-    attributesCompared,
-    'album',
-    standardTrack1.album,
-    standardTrack2.album
-  );
-
-  // Compare years
-  if (standardTrack1.year && standardTrack2.year) {
-    totalScore += weights.year * (standardTrack1.year === standardTrack2.year ? 0 : 1);
-    attributesCompared++;
-  } else {
-    totalScore += weights.missingPenalty;
-  }
-
-  console.log(
-    'totalScore',
-    totalScore,
-    'attributesCompared',
-    attributesCompared,
-    'year',
-    standardTrack1.year,
-    standardTrack2.year
-  );
-
-  // Compare artist names
-  if (standardTrack1.artists && standardTrack2.artists) {
-    totalScore +=
-      weights.artists *
-      jaccardSimilarity(
-        String(standardTrack1.artists).toLowerCase(),
-        String(standardTrack2.artists).toLowerCase()
-      );
-    attributesCompared++;
-  } else {
-    totalScore += weights.missingPenalty;
-  }
-
-  console.log(
-    'totalScore',
-    totalScore,
-    'attributesCompared',
-    attributesCompared,
-    'artists',
-    standardTrack1.artists,
-    standardTrack2.artists
-  );
-
-  // Compare track names
-  if (standardTrack1.name && standardTrack2.name) {
-    totalScore +=
-      weights.nameLevenshtein *
-      levenshteinDistance(
-        String(standardTrack1.name).toLowerCase(),
-        String(standardTrack2.name).toLowerCase()
-      );
-    totalScore +=
-      weights.nameJaccard * (1 - jaccardSimilarity(standardTrack1.name, standardTrack2.name));
-    totalScore +=
-      weights.nameLength * (1 - Math.abs(standardTrack1.name.length - standardTrack2.name.length));
-
-    attributesCompared++;
-  } else {
-    totalScore += weights.missingPenalty;
-  }
-
-  console.log(
-    'totalScore',
-    totalScore,
-    'attributesCompared',
-    attributesCompared,
-    'name',
-    standardTrack1.name,
-    standardTrack2.name
-  );
-
-  // Normalize score to account for number of attributes compared
-  if (attributesCompared > 0) {
-    totalScore = totalScore / attributesCompared;
-  }
-
-  console.log('totalEndScore', totalScore);
-
-  return totalScore;
+  return attributesCompared > 0 ? totalScore / attributesCompared : totalScore;
 }
 
 export function getMatchLocalSpotify(localTrackObj, spotifyTrackObj, maxScore = 100) {
-  const matchValue = CompareSourceTracks(
+  const matchValue = compareSourceTracks(
     {
       name: localTrackObj.Title,
       album: localTrackObj.Album,

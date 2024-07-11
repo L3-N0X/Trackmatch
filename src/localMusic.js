@@ -11,7 +11,6 @@ const loadAndParseFile = async () => {
   }
 };
 
-// loadAndParseFile();
 if (window.readAndParseFile) {
   loadAndParseFile();
 } else {

@@ -25,12 +25,16 @@ const ComparePage = () => {
       spotifyTrackList.forEach((spotifyTrack) => {
         temp_potentialMatches[spotifyTrack.track.id] = [];
         localTrackList.forEach((localTrack) => {
-          if (!localTrack.Title.includes(spotifyTrack.track.name.split(' ')[0])) {
-            return; // Frühzeitiger Abbruch, wenn die Titel offensichtlich nicht übereinstimmen
+          // frühzeitiger Abbruch, wenn die titel der tracks nicht gleich starten
+          if (
+            localTrack.Title.toLowerCase().substring(0, 5) !==
+            spotifyTrack.track.name.toLowerCase().substring(0, 5)
+          ) {
+            return;
           }
 
-          const [matchValue, percentage] = getMatchLocalSpotify(localTrack, spotifyTrack, 140);
-          if (matchValue > 160) {
+          const [matchValue, percentage] = getMatchLocalSpotify(localTrack, spotifyTrack, 50);
+          if (percentage < 30) {
             return; // Frühzeitiger Abbruch, wenn die Übereinstimmung gering ist
           }
           temp_potentialMatches[spotifyTrack.track.id].push({
