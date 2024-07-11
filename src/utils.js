@@ -85,43 +85,25 @@ function levenshteinDistance(str1, str2) {
 }
 
 function jaccardSimilarity(str1, str2) {
-  // Remove common words that don't significantly contribute to the song identity
-  const commonWords = ['the', 'a', 'an', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by'];
-  const cleanName1 = str1
-    .split(' ')
-    .filter((word) => !commonWords.includes(word))
-    .join(' ');
-  const cleanName2 = str2
-    .split(' ')
-    .filter((word) => !commonWords.includes(word))
-    .join(' ');
-
   // Calculate Jaccard similarity
-  const set1 = new Set(cleanName1.split(' '));
-  const set2 = new Set(cleanName2.split(' '));
+  const set1 = new Set(str1.split(' '));
+  const set2 = new Set(str2.split(' '));
   const intersection = new Set([...set1].filter((x) => set2.has(x)));
   const union = new Set([...set1, ...set2]);
   const jaccardSimilarity = intersection.size / union.size;
 
-  // Calculate edit distance similarity
-  const maxLength = Math.max(cleanName1.length, cleanName2.length);
-  const editDistance = levenshteinDistance(cleanName1, cleanName2);
-  const editSimilarity = 1 - editDistance / maxLength;
-
-  // Combine Jaccard and edit distance similarities
-  return jaccardSimilarity * 0.7 + editSimilarity * 0.3;
+  return 1 - jaccardSimilarity;
 }
 
-function compareTracks(standardTrack1, standardTrack2) {
+function CompareSourceTracks(standardTrack1, standardTrack2) {
   const weights = {
     album: 4,
-    year: 2,
-    artists: 7,
-    duration: 1,
-    // name: 13,
-    nameMain: 40,
-    nameSecondary: 10,
-    missingPenalty: 10 // Penalty for missing attributes
+    year: 4,
+    artists: 20,
+    nameLevenshtein: 4,
+    nameJaccard: 20,
+    nameLength: 20,
+    missingPenalty: 50 // Penalty for missing attributes
   };
 
   let totalScore = 0;
@@ -140,6 +122,16 @@ function compareTracks(standardTrack1, standardTrack2) {
     totalScore += weights.missingPenalty;
   }
 
+  console.log(
+    'totalScore',
+    totalScore,
+    'attributesCompared',
+    attributesCompared,
+    'album',
+    standardTrack1.album,
+    standardTrack2.album
+  );
+
   // Compare years
   if (standardTrack1.year && standardTrack2.year) {
     totalScore += weights.year * (standardTrack1.year === standardTrack2.year ? 0 : 1);
@@ -148,11 +140,21 @@ function compareTracks(standardTrack1, standardTrack2) {
     totalScore += weights.missingPenalty;
   }
 
+  console.log(
+    'totalScore',
+    totalScore,
+    'attributesCompared',
+    attributesCompared,
+    'year',
+    standardTrack1.year,
+    standardTrack2.year
+  );
+
   // Compare artist names
   if (standardTrack1.artists && standardTrack2.artists) {
     totalScore +=
       weights.artists *
-      levenshteinDistance(
+      jaccardSimilarity(
         String(standardTrack1.artists).toLowerCase(),
         String(standardTrack2.artists).toLowerCase()
       );
@@ -161,70 +163,74 @@ function compareTracks(standardTrack1, standardTrack2) {
     totalScore += weights.missingPenalty;
   }
 
-  // Compare duration (in seconds)
-  if (standardTrack1.duration && standardTrack2.duration) {
-    totalScore += weights.duration * Math.abs(standardTrack1.duration - standardTrack2.duration);
-    attributesCompared++;
-  } else {
-    totalScore += weights.missingPenalty;
-  }
+  console.log(
+    'totalScore',
+    totalScore,
+    'attributesCompared',
+    attributesCompared,
+    'artists',
+    standardTrack1.artists,
+    standardTrack2.artists
+  );
 
   // Compare track names
   if (standardTrack1.name && standardTrack2.name) {
-    const [name1Main, name1Secondary = ''] = String(standardTrack1.name).split('(');
-    const [name2Main, name2Secondary = ''] = String(standardTrack2.name).split('(');
-
-    // Compare main part of the name
-    const mainNameSimilarity = jaccardSimilarity(
-      name1Main.trim().toLowerCase(),
-      name2Main.trim().toLowerCase()
-    );
-    totalScore += weights.nameMain * (1 - mainNameSimilarity);
-
-    // Compare secondary part of the name (if it exists)
-    if (name1Secondary || name2Secondary) {
-      const secondaryNameDistance = levenshteinDistance(
-        name1Secondary.replace(')', '').trim().toLowerCase(),
-        name2Secondary.replace(')', '').trim().toLowerCase()
+    totalScore +=
+      weights.nameLevenshtein *
+      levenshteinDistance(
+        String(standardTrack1.name).toLowerCase(),
+        String(standardTrack2.name).toLowerCase()
       );
-      const maxSecondaryLength = Math.max(name1Secondary.length, name2Secondary.length);
-      const normalizedSecondaryDistance = secondaryNameDistance / (maxSecondaryLength || 1);
-      totalScore += weights.nameSecondary * normalizedSecondaryDistance;
-    }
+    totalScore +=
+      weights.nameJaccard * (1 - jaccardSimilarity(standardTrack1.name, standardTrack2.name));
+    totalScore +=
+      weights.nameLength * (1 - Math.abs(standardTrack1.name.length - standardTrack2.name.length));
 
     attributesCompared++;
   } else {
     totalScore += weights.missingPenalty;
   }
+
+  console.log(
+    'totalScore',
+    totalScore,
+    'attributesCompared',
+    attributesCompared,
+    'name',
+    standardTrack1.name,
+    standardTrack2.name
+  );
 
   // Normalize score to account for number of attributes compared
   if (attributesCompared > 0) {
     totalScore = totalScore / attributesCompared;
   }
 
+  console.log('totalEndScore', totalScore);
+
   return totalScore;
 }
 
 export function getMatchLocalSpotify(localTrackObj, spotifyTrackObj, maxScore = 100) {
-  const matchValue = compareTracks(
+  const matchValue = CompareSourceTracks(
     {
       name: localTrackObj.Title,
       album: localTrackObj.Album,
-      year: localTrackObj.Year,
+      year: String(localTrackObj.Year),
       artists: localTrackObj.Artist,
       duration: localTrackObj.TotalTime
     },
     {
       name: spotifyTrackObj.track.name,
       album: spotifyTrackObj.track.album.name,
-      year: spotifyTrackObj.track.album.release_date,
+      year: spotifyTrackObj.track.album.release_date.split('-')[0],
       artists: spotifyTrackObj.track.artists.map((artist) => artist.name).join(', '),
       duration: spotifyTrackObj.track.duration_ms / 1000
     }
   );
 
   const minScore = 0;
-  const highSimilarityPercentage = 99;
+  const highSimilarityPercentage = 100;
 
   let score = matchValue;
 

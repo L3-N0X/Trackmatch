@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useMusic } from '../components/context/mainContext.jsx';
 import { getAllLocalTracks } from '../localMusic.js';
 import { getMatchLocalSpotify } from '../utils.js';
-import CompareTrack from '../components/CompareTrack.jsx';
+import CompareSourceTrack from '../components/CompareSourceTrack.jsx';
+import CompareResultTrack from '../components/CompareResultTrack.jsx';
 
 const ComparePage = () => {
   const { currentPlaylist } = useMusic();
@@ -28,8 +29,8 @@ const ComparePage = () => {
             return; // Frühzeitiger Abbruch, wenn die Titel offensichtlich nicht übereinstimmen
           }
 
-          const [matchValue, percentage] = getMatchLocalSpotify(localTrack, spotifyTrack);
-          if (matchValue > 90) {
+          const [matchValue, percentage] = getMatchLocalSpotify(localTrack, spotifyTrack, 140);
+          if (matchValue > 160) {
             return; // Frühzeitiger Abbruch, wenn die Übereinstimmung gering ist
           }
           temp_potentialMatches[spotifyTrack.track.id].push({
@@ -62,20 +63,14 @@ const ComparePage = () => {
             return (
               <div key={trackID} className="">
                 <div className="text-xl text-primary-600 ">
-                  <CompareTrack
+                  <CompareSourceTrack
                     track={getTrack(trackID)}
                     key={trackID}
-                    isSource={true}></CompareTrack>
+                    isSource={true}></CompareSourceTrack>
                 </div>
                 <ul>
                   {potentialMatches[trackID].map((match) => {
-                    return (
-                      <li key={match.localTrack.Title} className="w-full grid grid-cols-3">
-                        <p>{match.localTrack.Title + ' - ' + match.localTrack.Artist}</p>
-                        <p>{match.matchValue}</p>
-                        <p>{match.percentage}%</p>
-                      </li>
-                    );
+                    return <CompareResultTrack match={match} key={trackID}></CompareResultTrack>;
                   })}
                 </ul>
               </div>
