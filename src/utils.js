@@ -93,6 +93,7 @@ function compareSourceTracks(track1, track2) {
     nameLevenshtein: 13,
     nameJaccard: 20,
     nameLength: 4,
+    nameOtherParts: 0.5,
     missingPenalty: 20
   };
   let totalScore = 0,
@@ -134,6 +135,16 @@ function compareSourceTracks(track1, track2) {
           Math.abs(nameParts1[0].length - nameParts2[0].length) /
             Math.max(nameParts1[0].length, nameParts2[0].length));
       attributesCompared++;
+
+      // compare the rest of the name parts
+      for (let i = 1; i < Math.min(nameParts1.length, nameParts2.length); ++i) {
+        totalScore +=
+          weights.nameOtherParts *
+          levenshteinDistance(
+            nameParts1[i] ? nameParts1[i].toLowerCase() : '',
+            nameParts2[i] ? nameParts2[i].toLowerCase() : ''
+          );
+      }
     } else {
       const name1 = track1.name.toLowerCase(),
         name2 = track2.name.toLowerCase();
