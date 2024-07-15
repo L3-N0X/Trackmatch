@@ -24,7 +24,7 @@ const PlaylistPage = () => {
     const fetchPlaylist = async () => {
       try {
         await spotifyApi.getPlaylist(playlistId).then((data) => {
-          console.log(data.body);
+          console.log('playlist from page', data.body);
           setPlaylist(data.body);
         });
       } catch (error) {

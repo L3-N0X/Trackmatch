@@ -24,3 +24,12 @@ ipcRenderer.on('folder-selected', (event, folderPath) => {
   // Send the file path to the renderer process
   window.dispatchEvent(new CustomEvent('folder-selected', { detail: folderPath }));
 });
+
+contextBridge.exposeInMainWorld('musicPlayer', {
+  playTrack: (trackPath) => {
+    ipcRenderer.send('play-track', trackPath);
+  },
+  onTrackData: (callback) => {
+    ipcRenderer.on('track-data', (event, data) => callback(data));
+  }
+});
