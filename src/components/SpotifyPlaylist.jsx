@@ -11,6 +11,7 @@ import {
 // import SpotifySong from './SpotifySong';
 import PropTypes from 'prop-types';
 import { useAsyncList } from '@react-stately/data';
+import { spotifyApi } from '../spotify';
 
 const columns = [
   { name: 'NAME', uid: 'name' },
@@ -23,6 +24,13 @@ const SpotifyPlaylist = ({ playlist }) => {
   let tracklist = playlist.tracks.items;
   let list = useAsyncList({
     async load() {
+      // get all tracks from playlist
+      for (let i = 0; i < playlist.tracks.total; i += 100) {
+        await spotifyApi.getPlaylistTracks(playlist.id, { offset: i }).then((data) => {
+          tracklist = tracklist.concat(data.body.items);
+        });
+      }
+
       setIsLoading(false);
 
       return {
@@ -68,7 +76,7 @@ const SpotifyPlaylist = ({ playlist }) => {
         return (
           <div key={track.id} style={{ display: 'flex', alignItems: 'center' }}>
             <img
-              src={track.album.images[0].url}
+              src={track.album.images[0]?.url}
               alt={track.name}
               className="rounded-md mr-3 h-8 w-8 object-cover aspect-square"
             />

@@ -4,25 +4,37 @@ import { getAllLocalTracks } from '../localMusic.js';
 import { getMatchLocalSpotify } from '../utils.js';
 import CompareSourceTrack from '../components/CompareSourceTrack.jsx';
 import CompareResultTrack from '../components/CompareResultTrack.jsx';
+import { spotifyApi } from '../spotify.js';
 
 const ComparePage = () => {
   const { currentPlaylist } = useMusic();
   const [potentialMatches, setPotentialMatches] = useState({});
+  const [spotifyTrackList, setSpotifyTrackList] = useState([]);
 
   useEffect(() => {
-    if (!currentPlaylist) {
-      // Frühzeitiger Abbruch, wenn keine Playlist ausgewählt ist
-      return;
-    }
+    if (!currentPlaylist) return;
 
-    getAllLocalTracks().then((localTrackList) => {
+    const fetchTracks = async () => {
+      const localTrackList = await getAllLocalTracks();
+
       console.log('local', localTrackList);
       console.log('current', currentPlaylist);
 
-      const spotifyTrackList = currentPlaylist.tracks.items;
+      let _spotifyTrackList = [];
+
+      for (let i = 0; i < currentPlaylist.tracks.total; i += 100) {
+        console.log('i', i);
+        await spotifyApi.getPlaylistTracks(currentPlaylist.id, { offset: i }).then((data) => {
+          console.log('data', data);
+          _spotifyTrackList = _spotifyTrackList.concat(data.body.items);
+        });
+      }
+      console.log('spotify', _spotifyTrackList);
+      setSpotifyTrackList(_spotifyTrackList);
+
       let temp_potentialMatches = {};
 
-      spotifyTrackList.forEach((spotifyTrack) => {
+      _spotifyTrackList.forEach((spotifyTrack) => {
         temp_potentialMatches[spotifyTrack.track.id] = [];
         localTrackList.forEach((localTrack) => {
           // frühzeitiger Abbruch, wenn die titel der tracks nicht gleich starten
@@ -51,11 +63,13 @@ const ComparePage = () => {
       });
       setPotentialMatches(temp_potentialMatches);
       console.log('potentialMatches', temp_potentialMatches);
-    });
+    };
+
+    fetchTracks();
   }, [currentPlaylist]);
 
   const getTrack = (trackID) => {
-    const spotifyTrack = currentPlaylist.tracks.items.find((track) => track.track.id === trackID);
+    const spotifyTrack = spotifyTrackList.find((track) => track.track.id === trackID);
     return spotifyTrack.track;
   };
 

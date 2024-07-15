@@ -1,8 +1,9 @@
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
-import fs from 'fs';
+import * as fs from 'node:fs';
 import { XMLParser } from 'fast-xml-parser'; // XMLBuilder
 // import readMusicFolder from './electron-helper/readMusicFolder.js';
-// import path from 'path';
+import path from 'path';
+import url from 'url';
 
 // set __dirname
 
@@ -37,11 +38,21 @@ function createWindow() {
       preload: join(__dirname, 'preload.js') // provide the path to preload.js
     }
   });
-  console.log('IsDev ? : ', isDev);
-  const startURL = 'http://localhost:3000'; // Development URL
+  // console.log('IsDev ? : ', isDev);
+  // const startURL = 'http://localhost:3000'; // Development URL
   // isDev  ? : true,  `file://${path.join(__dirname, './build/index.html')}`; // Production URL
 
-  mainWindow.loadURL(startURL);
+  const appURL = app.isPackaged
+    ? url.format({
+        pathname: path.join(__dirname, 'index.html'),
+        protocol: 'file:',
+        slashes: true
+      })
+    : 'http://localhost:3000';
+  console.log('AppURL:', appURL);
+  mainWindow.loadURL(appURL);
+
+  // mainWindow.loadURL(startURL);
 
   if (isDev) {
     mainWindow.webContents.once('did-frame-finish-load', () => {
@@ -51,6 +62,53 @@ function createWindow() {
 
   mainWindow.on('closed', () => {
     mainWindow = null;
+  });
+
+  ipcMain.on('play-track', (event, trackPath) => {
+    // Dynamically get range header from request
+    const rangeHeader = event.headers && event.headers.range;
+
+    console.log('Range Header:', rangeHeader);
+
+    // Get the file stats
+    fs.stat(trackPath, (err, stats) => {
+      if (err) {
+        console.error('Error getting file stats', err);
+        event.sender.send('track-error', 'Failed to get file stats.');
+        return;
+      }
+
+      let start, end;
+      if (rangeHeader) {
+        const parts = rangeHeader.replace(/bytes=/, '').split('-');
+        start = parseInt(parts[0], 10);
+        end = parts[1] ? parseInt(parts[1], 10) : stats.size - 1;
+      } else {
+        start = 0;
+        end = stats.size - 1;
+      }
+
+      const options = { encoding: 'base64', start: start, end: end };
+      fs.readFile(trackPath, options, (err, data) => {
+        if (err) {
+          console.error('Error reading file', err);
+          event.sender.send('track-error', 'Failed to read the track file.');
+          return;
+        }
+
+        // Construct response headers
+        const contentLength = end - start + 1;
+        const headers = {
+          'Content-Range': `bytes ${start}-${end}/${stats.size}`,
+          'Accept-Ranges': 'bytes',
+          'Content-Length': contentLength,
+          'Content-Type': 'audio/mpeg' // Adjust the content type based on your file type
+        };
+
+        // Send the data and headers back to the renderer process
+        event.sender.send('track-data', { data, headers });
+      });
+    });
   });
 }
 
