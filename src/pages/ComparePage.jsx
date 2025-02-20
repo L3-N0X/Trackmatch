@@ -37,17 +37,20 @@ const ComparePage = () => {
       _spotifyTrackList.forEach((spotifyTrack) => {
         temp_potentialMatches[spotifyTrack.track.id] = [];
         localTrackList.forEach((localTrack) => {
-          // frühzeitiger Abbruch, wenn die titel der tracks nicht gleich starten
+          // Ensure Title is defined and a string
           if (
+            !localTrack.Title ||
+            typeof localTrack.Title !== 'string' ||
+            !spotifyTrack.track.name ||
             localTrack.Title.toLowerCase().substring(0, 5) !==
-            spotifyTrack.track.name.toLowerCase().substring(0, 5)
+              spotifyTrack.track.name.toLowerCase().substring(0, 5)
           ) {
             return;
           }
 
           const [matchValue, percentage] = getMatchLocalSpotify(localTrack, spotifyTrack, 50);
           if (percentage < 30) {
-            return; // Frühzeitiger Abbruch, wenn die Übereinstimmung gering ist
+            return; // Early exit if match is too low
           }
           temp_potentialMatches[spotifyTrack.track.id].push({
             localTrack,
